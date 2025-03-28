@@ -1,0 +1,346 @@
+﻿<!-- 【使用上の注意】 -->
+<!-- Defalut値としてStyleを定義 -->
+<!-- 各配置場所による細かい変更点は、そのXAMLファイル内で上書きすること -->
+<!-- 使用状況をコメント欄の備考に記載すること -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Label -->
+    <!-- 備考： 通常使用するStyleとして定義 -->
+    <Style x:Key="Standard_Label" TargetType="Label">
+        <Setter Property="Width"                                    Value="auto"/>
+        <Setter Property="Height"                                   Value="auto"/>
+        <Setter Property="FontFamily"                               Value="M+ 2p bold"/>
+        <Setter Property="FontSize"                                 Value="18"/>
+        <Setter Property="IsTabStop"                                Value="False"/>
+        <Setter Property="VerticalContentAlignment"                 Value="Center"/>
+        <Setter Property="HorizontalContentAlignment"               Value="Left"/>
+        <Setter Property="BorderThickness"                          Value="0"/>
+        <Setter Property="BorderBrush"                              Value="DarkGray"/>
+    </Style>
+
+    <!-- Label -->
+    <!-- 備考: 矢印表示用 -->
+    <Style x:Key="Arrow_Label" TargetType="Label">
+        <Setter Property="Width"                                    Value="auto"/>
+        <Setter Property="Height"                                   Value="auto"/>
+        <Setter Property="IsTabStop"                                Value="False"/>
+        <Setter Property="VerticalContentAlignment"                 Value="Center"/>
+        <Setter Property="HorizontalContentAlignment"               Value="Center"/>
+    </Style>
+
+    <!-- Polygon -->
+    <!-- 備考: 赤色右矢印 -->
+    <Style x:Key="Arrow_Polygon" TargetType="Polygon">
+        <Setter Property="Points"                                   Value="2,0 4,2 2,4 2,3 0,3 0,1 2,1 2,0"/>
+        <Setter Property="Fill"                                     Value="Red"/>
+        <Setter Property="Margin"                                   Value="0.5,0.5,0.5,0.5"/>
+    </Style>
+
+    <!-- Polygon -->
+    <!-- 備考: △アイコン -->
+    <Style x:Key="UpDown_Polygon" TargetType="Polygon">
+        <Setter Property="Points"                                   Value="2,0 4,4 0,4 2,0"/>
+        <Setter Property="Fill"                                     Value="Blue"/>
+        <Setter Property="Margin"                                   Value="0.5,0.5,0.5,0.5"/>
+    </Style>
+
+    <!-- Button -->
+    <!-- 備考: ボタン文字列を中央揃えとするテンプレートの定義 -->
+    <!-- テンプレートの内部はオーバーライドできないため、それぞれで定義する -->
+        <ControlTemplate x:Key="ButtonTextCenterAlignmentTemplate" TargetType="{x:Type Button}">
+        <Border SnapsToDevicePixels="True"
+            BorderThickness="1.5"
+            BorderBrush="DarkGray"
+            Background="{TemplateBinding Background}">
+            <Grid>
+                <ContentPresenter
+                Margin="2"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                RecognizesAccessKey="True" />
+            </Grid>
+        </Border>
+
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#00ff00"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="WhiteSmoke"/>
+                <Setter Property="Foreground" Value="Gray"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!-- Button -->
+    <!-- 備考: ボタン文字列を左揃えとするテンプレートの定義 -->
+    <!-- テンプレートの内部はオーバーライドできないため、それぞれで定義する -->
+    <ControlTemplate x:Key="ButtonTextLeftAlignmentTemplate" TargetType="{x:Type Button}">
+        <Border SnapsToDevicePixels="True"
+        BorderThickness="1.5"
+        BorderBrush="DarkGray"
+        Background="{TemplateBinding Background}">
+            <Grid>
+                <ContentPresenter
+            Margin="2"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center"
+            RecognizesAccessKey="True" />
+            </Grid>
+        </Border>
+
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#00ff00"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Background" Value="WhiteSmoke"/>
+                <Setter Property="Foreground" Value="Gray"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <!-- Button -->
+    <!-- 備考: 通常使用するStyleとして定義 -->
+    <Style x:Key="Standard_Button" TargetType="Button">
+        <Setter Property="Width"                                    Value="auto"/>
+        <Setter Property="Height"                                   Value="auto"/>
+        <Setter Property="FontFamily"                               Value="M+ 2p bold"/>
+        <Setter Property="FontSize"                                 Value="14"/>
+        <Setter Property="IsTabStop"                                Value="False"/>
+        <Setter Property="VerticalContentAlignment"                 Value="Center"/>
+        <Setter Property="HorizontalContentAlignment"               Value="Center"/>
+        <Setter Property="BorderThickness"                          Value="1.5"/>
+        <Setter Property="BorderBrush"                              Value="DarkGray"/>
+        <Setter Property="Template" Value="{StaticResource ButtonTextCenterAlignmentTemplate}"/>
+    </Style>
+
+    <!-- Toggle Button -->
+    <!-- 備考: 通常使用するStyleとして定義 -->
+    <Style x:Key="Standard_ToggleButton" TargetType="ToggleButton">
+        <Setter Property="Width"                                    Value="auto"/>
+        <Setter Property="Height"                                   Value="auto"/>
+        <Setter Property="FontFamily"                               Value="M+ 2p bold"/>
+        <Setter Property="FontSize"                                 Value="14"/>
+        <Setter Property="IsTabStop"                                Value="False"/>
+        <Setter Property="VerticalContentAlignment"                 Value="Center"/>
+        <Setter Property="HorizontalContentAlignment"               Value="Center"/>
+        <Setter Property="BorderThickness"                          Value="1.5"/>
+        <Setter Property="BorderBrush"                              Value="DarkGray"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border SnapsToDevicePixels="True"
+                            BorderThickness="1.5"
+                            BorderBrush="DarkGray"                          
+                            Background="{TemplateBinding Background}">
+                        <Grid>
+                            <ContentPresenter
+                                Margin="2"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+                        </Grid>
+                    </Border>
+                    
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Background" Value="#00ff00"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#00ff00"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Radio Button -->
+    <!-- 備考: 通常使用するStyleとして定義 -->
+    <Style x:Key="Standard_RadioButton" TargetType="RadioButton">
+        <Setter Property="Width"                                    Value="auto"/>
+        <Setter Property="Height"                                   Value="auto"/>
+        <Setter Property="FontFamily"                               Value="M+ 2p bold"/>
+        <Setter Property="FontSize"                                 Value="14"/>
+        <Setter Property="IsTabStop"                                Value="False"/>
+        <Setter Property="VerticalContentAlignment"                 Value="Center"/>
+        <Setter Property="HorizontalContentAlignment"               Value="Left"/>
+        <Setter Property="BorderThickness"                          Value="1.5"/>
+        <Setter Property="BorderBrush"                              Value="DarkGray"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border SnapsToDevicePixels="True"
+                    BorderThickness="1.5"
+                    BorderBrush="DarkGray"                          
+                    Background="{TemplateBinding Background}">
+                        <Grid>
+                            <ContentPresenter
+                                Margin="2"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Background" Value="#00ff00"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#00ff00"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- 備考: トグルボタンの見た目で表示するラジオボタン -->
+    <Style x:Key="Toggle_RadioButton" TargetType="RadioButton" BasedOn = "{StaticResource {x:Type ToggleButton}}">
+        <Setter Property="Width"                                    Value="auto"/>
+        <Setter Property="Height"                                   Value="auto"/>
+        <Setter Property="FontFamily"                               Value="M+ 2p bold"/>
+        <Setter Property="FontSize"                                 Value="14"/>
+        <Setter Property="IsTabStop"                                Value="False"/>
+        <Setter Property="VerticalContentAlignment"                 Value="Center"/>
+        <Setter Property="HorizontalContentAlignment"               Value="Center"/>
+        <Setter Property="BorderThickness"                          Value="1.5"/>
+        <Setter Property="BorderBrush"                              Value="DarkGray"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border SnapsToDevicePixels="True"
+                    BorderThickness="1.5"
+                    BorderBrush="DarkGray"
+                    Background="{TemplateBinding Background}">
+                        <Grid>
+                            <ContentPresenter
+                                Margin="2"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True" />
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Background" Value="#00ff00"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#00ff00"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- Text Box -->
+    <!-- 備考: 通常使用するStyleとして定義 -->
+    <Style x:Key="Standard_TextBox" TargetType="TextBox">
+        <Setter Property="Width"                                    Value="auto"/>
+        <Setter Property="Height"                                   Value="auto"/>
+        <Setter Property="FontFamily"                               Value="M+ 2p bold"/>
+        <Setter Property="FontSize"                                 Value="14"/>
+        <Setter Property="IsTabStop"                                Value="True"/>
+        <Setter Property="VerticalContentAlignment"                 Value="Center"/>
+        <Setter Property="HorizontalContentAlignment"               Value="Center"/>
+        <Setter Property="BorderThickness"                          Value="1.5"/>
+        <Setter Property="BorderBrush"                              Value="DarkGray"/>
+        <Setter Property="TextAlignment"                            Value="Center"/>
+        <Setter Property="InputMethod.IsInputMethodSuspended"       Value="True"/>
+        <Setter Property="Background"                               Value="White"/>
+    </Style>
+
+    <!-- Text Box -->
+    <!-- 備考: ユーザによる変更不可のもの -->
+    <Style x:Key="Display_TextBox" TargetType="TextBox">
+        <Setter Property="Width"                                    Value="auto"/>
+        <Setter Property="Height"                                   Value="auto"/>
+        <Setter Property="FontFamily"                               Value="M+ 2p bold"/>
+        <Setter Property="FontSize"                                 Value="14"/>
+        <Setter Property="IsTabStop"                                Value="False"/>
+        <Setter Property="VerticalContentAlignment"                 Value="Center"/>
+        <Setter Property="HorizontalContentAlignment"               Value="Center"/>
+        <Setter Property="BorderThickness"                          Value="1.5"/>
+        <Setter Property="BorderBrush"                              Value="DarkGray"/>
+        <Setter Property="IsReadOnly"                               Value="True"/>
+        <Setter Property="Background"                               Value="#fdf5ed"/>
+    </Style>
+
+    <!-- Text Block -->
+    <!-- 備考: 通常使用するStyleとして定義 -->
+    <Style x:Key="Standard_TextBlock" TargetType="TextBlock">
+        <Setter Property="Width"                                    Value="auto"/>
+        <Setter Property="Height"                                   Value="auto"/>
+        <Setter Property="FontFamily"                               Value="M+ 2p bold"/>
+        <Setter Property="FontSize"                                 Value="14"/>
+        <Setter Property="TextAlignment"                            Value="Center"/>
+        <Setter Property="VerticalAlignment"                        Value="Center"/>
+    </Style>
+
+    <!-- Combo Box -->
+    <!-- 備考: 通常使用するStyleとして定義 -->
+    <Style x:Key="Standard_ComboBox" TargetType="ComboBox">
+        <Setter Property="Width"                                    Value="auto"/>
+        <Setter Property="Height"                                   Value="auto"/>
+        <Setter Property="FontFamily"                               Value="M+ 2p bold"/>
+        <Setter Property="FontSize"                                 Value="14"/>
+        <Setter Property="IsTabStop"                                Value="True"/>
+        <Setter Property="VerticalContentAlignment"                 Value="Center"/>
+        <Setter Property="HorizontalContentAlignment"               Value="Center"/>
+        <Setter Property="BorderThickness"                          Value="1.5"/>
+        <Setter Property="BorderBrush"                              Value="DarkGray"/>
+        <Setter Property="IsEditable"                               Value="False"/>
+    </Style>
+
+    <!-- Check Box -->
+    <!-- 備考: 通常使用するStyleとして定義 -->
+    <Style x:Key="Standard_CheckBox" TargetType="CheckBox">
+        <Setter Property="Width"                                    Value="auto"/>
+        <Setter Property="Height"                                   Value="auto"/>
+        <Setter Property="FontFamily"                               Value="M+ 2p bold"/>
+        <Setter Property="FontSize"                                 Value="14"/>
+        <Setter Property="IsTabStop"                                Value="True"/>
+        <Setter Property="BorderThickness"                          Value="1.5"/>
+        <Setter Property="BorderBrush"                              Value="DarkGray"/>
+        <Setter Property="HorizontalAlignment"                      Value="Left"/>
+        <Setter Property="VerticalAlignment"                        Value="Center"/>
+    </Style>
+    
+    <!-- Tab Item -->
+    <!-- 備考: 通常使用するStyleとして定義 -->
+    <Style x:Key="Standard_TabItem" TargetType="TabItem">
+        <Setter Property="Width"                                    Value="auto"/>
+        <Setter Property="Height"                                   Value="auto"/>
+        <Setter Property="FontFamily"                               Value="M+ 2p bold"/>
+        <Setter Property="FontSize"                                 Value="14"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Border SnapsToDevicePixels="True"
+                            BorderThickness="1.5"
+                            BorderBrush="DarkGray"
+                            Background="{TemplateBinding Background}">
+                        <ContentPresenter
+                            ContentSource="Header"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Margin="2"/>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#00ff00"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#00ff00"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>
