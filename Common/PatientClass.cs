@@ -290,7 +290,7 @@
   }
 
   public class AxmComment {
-    public int ID { get; set; } = default!;                 //AXM用コメントデータID
+    public int? ID { get; set; } = default!;                 //AXM用コメントデータID
     public AxmCommentType CommentType { get; set; } = 0;    //コメントタイプ
     public string Description { get; set; } = default!;     //コメント
     public DateTime? ExamDateTime { get; set; }             //測定日時

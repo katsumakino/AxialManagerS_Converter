@@ -161,6 +161,8 @@ namespace AxialManagerS_Converter.Components.Model {
       // srcPathからファイル名にCommentLog.jsonを含むファイルを探索
       List<string> commentFileList = new();
 
+      DBAxmCommentController dBAxmComment = new();
+
       try {
         utilities.SearchFilesContainingString(srcPath, ConverterGlobal.Axm1CommentFileName, ref commentFileList);
 
@@ -178,13 +180,23 @@ namespace AxialManagerS_Converter.Components.Model {
                 }
 
                 if (values.Count == 2) {
-                  if (property.Name == "PatientData") {
-                    // todo: 被検者コメントをDBに書込
+                  AxmCommentRequest request = new AxmCommentRequest {
+                    PatientID = pt_id,
+                    AxmComment = new AxmComment() {
+                      ID = null,
+                      CommentType = property.Name == "PatientData" ? AxmCommentType.Patient : AxmCommentType.ExamDate,
+                      Description = values[1],
+                      ExamDateTime = DateTime.TryParse(values[0], out DateTime examDate) ? examDate : DateTime.Today
+                    }
+                  };
 
+                  if (property.Name == "PatientData") {
+                    // 被検者コメントをDBに書込
+                    dBAxmComment.SetAxmComment(request);
                   } else {
                     if (values[1] != string.Empty) {
-                      // todo: 測定日コメントをDBに書込
-
+                      // 測定日コメントをDBに書込
+                      dBAxmComment.SetAxmComment(request);
                     }
                   }
                 }
