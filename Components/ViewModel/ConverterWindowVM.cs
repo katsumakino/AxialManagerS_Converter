@@ -31,7 +31,7 @@ namespace AxialManagerS_Converter.Components.ViewModel {
         string settingFilePath = System.IO.Path.Combine(_srcFolder, ConverterGlobal.Axm1SettingFileName);
         // 設定ファイルを読み込み→変換
         // todo: 変換後のファイル名設定
-        //_model.ConvertSettingFile(settingFilePath, "");
+        //_model.ConvertSettingFile(settingFilePath);
         // todo: 合否確認
 
         // DBからデータを読み込み→変換
