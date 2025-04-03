@@ -1,7 +1,5 @@
 ﻿using AxialManagerS_Converter.Common;
 using AxialManagerS_Converter.Converter;
-using System;
-using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Text.Json;
@@ -9,13 +7,17 @@ using System.Text.Json;
 namespace AxialManagerS_Converter.Components.Model {
   public class ConvertWindowModel {
 
+    // todo: 設定ファイルのパスを確認(wwwroot?)
+    private string settingDirTopPath = @"C:/TomeyApp/AxialManager2/Setting/";
+    private readonly string settingFileName = "GeneralSetting.json";
+
     /// <summary>
     /// 設定ファイル変換
     /// </summary>
     /// <param name="srcPath"></param>
     /// <param name="destPath"></param>
     /// <returns></returns>
-    public bool ConvertSettingFile(string srcPath, string destPath) {
+    public bool ConvertSettingFile(string srcPath) {
       FIleUtilities utilities = new();
 
       try {
@@ -29,11 +31,122 @@ namespace AxialManagerS_Converter.Components.Model {
         // Jsonファイルからデシリアライズ
         var setting = JsonSerializer.Deserialize<Axm1SettingClass.JsonSettingData>(json);
 
-        // todo: AXM2の設定ファイルに変換
+        string destPath = Path.Combine(settingDirTopPath, settingFileName);
+
+        GeneralSetting? axm2Setting = new();
+
+        if (utilities.FileExists(destPath)) {
+          // AXM2の設定ファイル読出し
+          string json2 = File.ReadAllText(destPath);
+          axm2Setting = JsonSerializer.Deserialize<GeneralSetting>(json2);
+        }
+
+        // AXM2の設定ファイルに変換
+        JsonSettingDataToGeneralSetting(in setting, ref axm2Setting);
+
+        // フォルダの作成
+        utilities.CreateDir(settingDirTopPath);
+
+        // JSONシリアライズオプションを設定
+        var options = new JsonSerializerOptions {
+          WriteIndented = true
+        };
+
+        // AXM2の設定ファイルに書込
+        string writeJson = JsonSerializer.Serialize(axm2Setting, options);
+        File.WriteAllText(destPath, writeJson);
+
       } catch {
       } finally { }
 
       return true;
+    }
+
+    /// <summary>
+    /// 旧AXMの設定をAXM2の設定に変換
+    /// </summary>
+    /// <param name="axm1Setting"></param>
+    /// <param name="axm2Setting"></param>
+    private void JsonSettingDataToGeneralSetting(in Axm1SettingClass.JsonSettingData? axm1Setting, ref GeneralSetting? axm2Setting) {
+      if(axm1Setting == null) return; // 変換元無し
+      if(axm2Setting == null) axm2Setting = new();
+      if(axm2Setting.DisplaySetting == null) axm2Setting.DisplaySetting = new();
+      if(axm2Setting.OutPutSetting == null) axm2Setting.OutPutSetting = new();  // todo: 出力設定
+
+      // AXIAL 変換方式
+      switch (axm1Setting.Axial_Converter_Type) {
+        case Axm1SettingClass.SelectConvertType.kConvertTypeContact:
+          axm2Setting.DisplaySetting.AxialFittingsType = FittingsType.Contact;
+          break;
+        case Axm1SettingClass.SelectConvertType.kConvertTypeContact2:
+          axm2Setting.DisplaySetting.AxialFittingsType = FittingsType.Contact2;
+          break;
+        case Axm1SettingClass.SelectConvertType.kConvertTypeOptLength:
+          axm2Setting.DisplaySetting.AxialFittingsType = FittingsType.OptLength;
+          break;
+        case Axm1SettingClass.SelectConvertType.kConvertTypeImmersion:
+        default:
+          axm2Setting.DisplaySetting.AxialFittingsType = FittingsType.Immersion;
+          break;
+      }
+
+      // REF データタイプ
+      switch (axm1Setting.Ref_Value_Type) {
+        case Axm1SettingClass.SelectValueType.kValueTypeTypical:
+          axm2Setting.DisplaySetting.RefSelectType = SelectType.Median;
+          break;
+        case Axm1SettingClass.SelectValueType.kValueTypeAverage:
+        default:
+          axm2Setting.DisplaySetting.RefSelectType = SelectType.Average;
+          break;
+      }
+
+      // KRT データタイプ
+      switch (axm1Setting.Krt_Value_Type) {
+        case Axm1SettingClass.SelectValueType.kValueTypeTypical:
+          axm2Setting.DisplaySetting.KrtSelectType = SelectType.Median;
+          break;
+        case Axm1SettingClass.SelectValueType.kValueTypeAverage:
+        default:
+          axm2Setting.DisplaySetting.KrtSelectType = SelectType.Average;
+          break;
+      }
+
+      // KRT 装置種別
+      switch (axm1Setting.Krt_Device_Type) {
+        case Axm1SettingClass.SelectDeviceType.kDeviceTypeMR:
+          axm2Setting.DisplaySetting.KrtDeviceType = KrtDeviceType.MR;
+          break;
+        case Axm1SettingClass.SelectDeviceType.kDeviceTypeOA:
+        default:
+          axm2Setting.DisplaySetting.KrtDeviceType = KrtDeviceType.OA2000;
+          break;
+      }
+
+      // KRT 測定位置
+      switch (axm1Setting.Krt_Phi_Type) {
+        case Axm1SettingClass.SelectPhiType.kPhiType2:
+          axm2Setting.DisplaySetting.KrtPhiType = PhiType.Phi2_0;
+          break;
+        case Axm1SettingClass.SelectPhiType.kPhiType2_5:
+          axm2Setting.DisplaySetting.KrtPhiType = PhiType.Phi2_5;
+          break;
+        case Axm1SettingClass.SelectPhiType.kPhiType3:
+        default:
+          axm2Setting.DisplaySetting.KrtPhiType = PhiType.Phi3_0;
+          break;
+      }
+
+      // PACHY 装置種別
+      switch(axm1Setting.Pachy_Device_Type) {
+        case Axm1SettingClass.SelectDeviceType.kDeviceTypeMR:
+          axm2Setting.DisplaySetting.PachyDeviceType = PachyDeviceType.MR;
+          break;
+        case Axm1SettingClass.SelectDeviceType.kDeviceTypeOA:
+        default:
+          axm2Setting.DisplaySetting.PachyDeviceType = PachyDeviceType.OA2000;
+          break;
+      }
     }
 
     /// <summary>
@@ -63,7 +176,7 @@ namespace AxialManagerS_Converter.Components.Model {
                   values.Add(element.GetString());
                 }
 
-                if(values.Count == 2) {
+                if (values.Count == 2) {
                   if (property.Name == "PatientData") {
                     // todo: 被検者コメントをDBに書込
 
@@ -98,7 +211,7 @@ namespace AxialManagerS_Converter.Components.Model {
       } catch {
       } finally { }
 
-        return true;
+      return true;
     }
 
     /// <summary>
@@ -247,8 +360,8 @@ namespace AxialManagerS_Converter.Components.Model {
               aR = reader[Axm1PatientClass.COLNAME_Axm1RefList
                 [(int)Axm1PatientClass.eAxm1RefTable.axisOd]].ToString();
               axialList.RA_deg = (aR != null) ? Convert.ToInt32(aR) : null;
-             sL = reader[Axm1PatientClass.COLNAME_Axm1RefList
-                [(int)Axm1PatientClass.eAxm1RefTable.sphOs]].ToString();
+              sL = reader[Axm1PatientClass.COLNAME_Axm1RefList
+                 [(int)Axm1PatientClass.eAxm1RefTable.sphOs]].ToString();
               axialList.LS_d = (sR != null) ? Convert.ToDouble(sL) : null;
               cL = reader[Axm1PatientClass.COLNAME_Axm1RefList
                 [(int)Axm1PatientClass.eAxm1RefTable.cylOs]].ToString();
@@ -257,7 +370,7 @@ namespace AxialManagerS_Converter.Components.Model {
                 [(int)Axm1PatientClass.eAxm1RefTable.axisOs]].ToString();
               axialList.LA_deg = (aL != null) ? Convert.ToInt32(aL) : null;
 
-              if(table == Axm1PatientClass.eAxm1DbTable.refTable) {
+              if (table == Axm1PatientClass.eAxm1DbTable.refTable) {
                 manual = true;
               } else {
                 manual = (reader[Axm1PatientClass.COLNAME_Axm1RefList
@@ -477,7 +590,7 @@ namespace AxialManagerS_Converter.Components.Model {
           using (var reader = command.ExecuteReader()) {
             while (reader.Read()) {
               TreatmentData treatmentList = new();
-              
+
               // データを読み取り、変換処理を行う
               medical = reader[Axm1PatientClass.COLNAME_Axm1MedicalTreatmentList
                 [(int)Axm1PatientClass.eAxm1MedicalTreatmentTable.id]].ToString() ?? string.Empty;
