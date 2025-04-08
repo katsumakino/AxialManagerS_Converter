@@ -1,6 +1,7 @@
 ﻿using AxialManagerS_Converter.Common;
 using AxialManagerS_Converter.Controllers;
 using AxialManagerS_Converter.Converter;
+using System;
 using System.Data.SQLite;
 using System.IO;
 using System.Text.Json;
@@ -11,6 +12,18 @@ namespace AxialManagerS_Converter.Components.Model {
     // todo: 設定ファイルのパスを確認(wwwroot?)
     private string settingDirTopPath = @"C:/TomeyApp/AxialManager2/Setting/";
     private readonly string settingFileName = "GeneralSetting.json";
+
+    // 旧AXM治療IDとAXM2治療IDの対比表
+    class TreatmentIdTable {
+      public string Axm1TreatmentId { get; set; } = string.Empty;
+      public int Axm2TreatmentId { get; set; } = 0;
+    }
+    private List<TreatmentIdTable> treatmentIdList = new();
+
+    static int? GetAxm2IdByAxm1Id(List<TreatmentIdTable> list, string axm1Id) {
+      var id = list.FirstOrDefault(p => p.Axm1TreatmentId == axm1Id);
+      return id?.Axm2TreatmentId;
+    }
 
     /// <summary>
     /// 設定ファイル変換
@@ -278,8 +291,7 @@ namespace AxialManagerS_Converter.Components.Model {
 
               // todo: SD Converterを見て、高速化手法確認
 
-              // todo: DBに書込
-
+              // DBに書込
               dbPatientInfo.SetPatientInfo(patientInfo);
             }
           }
@@ -337,9 +349,9 @@ namespace AxialManagerS_Converter.Components.Model {
               axialList.IsRManualInput = manual;
               axialList.IsLManualInput = manual;
 
-              // todo: DBに書込
               // todo: Table情報も渡す
 
+              // DBに書込
               dBAxialData.SetOptAxial(axialList);
             }
           }
@@ -419,11 +431,12 @@ namespace AxialManagerS_Converter.Components.Model {
               refList.IsRManualInput = manual;
               refList.IsLManualInput = manual;
 
-              // todo: DBに書込
               // todo: Table情報も渡す
               if (table == Axm1PatientClass.eAxm1DbTable.refTable) {
+                // DBに書込(自覚値)
                 dBSciRefData.SetSciRef(refList);
               } else {
+                // DBに書込(他覚値)
                 dBRefData.SetRef(refList);
               }
             }
@@ -498,8 +511,9 @@ namespace AxialManagerS_Converter.Components.Model {
               krtList.IsRManualInput = manual;
               krtList.IsLManualInput = manual;
 
-              // todo: DBに書込
               // todo: Table情報も渡す
+
+              // DBに書込
               dBKrtData.SetKrt(krtList);
             }
           }
@@ -557,8 +571,9 @@ namespace AxialManagerS_Converter.Components.Model {
               pachyList.IsRManualInput = manual;
               pachyList.IsLManualInput = manual;
 
-              // todo: DBに書込
               // todo: Table情報も渡す
+
+              // DBに書込
               dBPachyData.SetPachy(pachyList);
             }
           }
@@ -589,6 +604,9 @@ namespace AxialManagerS_Converter.Components.Model {
 
       DBTreatmentController dBTreatment = new();
 
+      // 治療方法IDの対比表を初期化
+      treatmentIdList.Clear();
+
       try {
         string sql = "SELECT * FROM " + Axm1PatientClass.Axm1DB_TableNames[(int)table];
         sql += " WHERE MEDICAL = 'Atropine'"; // todo: test確認用
@@ -613,9 +631,17 @@ namespace AxialManagerS_Converter.Components.Model {
                 [(int)Axm1PatientClass.eAxm1MedicalSetupTable.colorB]].ToString();
               treatmentList.RGBAColor.B = (int.TryParse(colorB, out int iColorB)) ? iColorB : 0;
 
-              // todo: DBに書込
-              // todo: IDを新規取得する
-              //dBTreatment.SetTreatmentMethod(treatmentList);
+              // IDを新規取得する
+              treatmentList.ID = dBTreatment.GetTreatmentId(treatmentList.TreatName);
+
+              // DBに書込
+              dBTreatment.SetTreatmentMethod(treatmentList);
+
+              // 治療IDの対比表更新
+              treatmentIdList.Add(new TreatmentIdTable() {
+                Axm1TreatmentId = id,
+                Axm2TreatmentId = treatmentList.ID
+              });
             }
           }
         }
@@ -638,6 +664,12 @@ namespace AxialManagerS_Converter.Components.Model {
         return false;
       }
 
+      if(treatmentIdList.Count == 0) {
+        // 治療方法テーブルの変換が行われていない
+        return false;
+      }
+
+      int? treatId;
       string? medical;
       string? id;
       string? start;
@@ -656,10 +688,9 @@ namespace AxialManagerS_Converter.Components.Model {
 
               // データを読み取り、変換処理を行う
               medical = reader[Axm1PatientClass.COLNAME_Axm1MedicalTreatmentList
-                [(int)Axm1PatientClass.eAxm1MedicalTreatmentTable.id]].ToString() ?? string.Empty;
+                [(int)Axm1PatientClass.eAxm1MedicalTreatmentTable.Medical]].ToString() ?? string.Empty;
               id = reader[Axm1PatientClass.COLNAME_Axm1MedicalTreatmentList
                 [(int)Axm1PatientClass.eAxm1MedicalTreatmentTable.id]].ToString() ?? string.Empty;
-              treatmentList.ID = (int.TryParse(id, out int iId)) ? iId : 0;
               start = reader[Axm1PatientClass.COLNAME_Axm1MedicalTreatmentList
                 [(int)Axm1PatientClass.eAxm1MedicalTreatmentTable.startDate]].ToString();
               // DateTime型に変換
@@ -669,11 +700,23 @@ namespace AxialManagerS_Converter.Components.Model {
               // DateTime型に変換
               treatmentList.EndDateTime = DateTime.TryParse(end, out DateTime edDt) ? edDt : null;
 
-              // todo: DBに書込
-              // todo: ID変換(string -> int)
-              treatmentDataRequest.PatientID = string.Empty;  // todo:
+              // ID変換(string -> int)
+              treatId = GetAxm2IdByAxm1Id(treatmentIdList, medical);
+              if(treatId != null) {
+                treatmentList.TreatID = (int)treatId;
+              } else {
+                continue;
+              }
+
+              // 被検者IDを取得
+              if(id == null || id == string.Empty) {
+                continue;
+              }
+              treatmentDataRequest.PatientID = id;
               treatmentDataRequest.TreatmentData = treatmentList;
-              //dBTreatment.SetTreatment(treatmentDataRequest);
+
+              // DBに書込
+              dBTreatment.SetTreatment(treatmentDataRequest);
             }
           }
         }

@@ -1,7 +1,9 @@
 ﻿using AxialManagerS_Converter.Common;
 using Npgsql;
 using System.Data;
+using System.Data.SqlClient;
 using System.Text;
+using System.Windows;
 using static AxialManagerS_Converter.Controllers.DBCommonController;
 
 namespace AxialManagerS_Converter.Controllers {
@@ -109,8 +111,8 @@ namespace AxialManagerS_Converter.Controllers {
             treatment_id = treat_id,
             treatmenttype_id = type_id,
             pt_uuid = uuid,
-            start_at = conditions.TreatmentData.StartDateTime,
-            end_at = conditions.TreatmentData.EndDateTime,
+            start_at = conditions.TreatmentData.StartDateTime ?? DateTime.MinValue,
+            end_at = conditions.TreatmentData.EndDateTime ?? DateTime.MaxValue,
             created_at = dateNow,
             updated_at = dateNow
           }, sqlConnection);
@@ -129,6 +131,32 @@ namespace AxialManagerS_Converter.Controllers {
       }
 
       return;
+    }
+
+    /// <summary>
+    /// 治療名称から治療IDを取得する関数
+    /// </summary>
+    /// <param name="treatmentName"></param>
+    /// <returns></returns>
+    public int GetTreatmentId(string treatmentName) {
+      int id = 0;
+      DBAccess dbAccess = DBAccess.GetInstance();
+
+      try {
+        // PostgreSQL Server 通信接続
+        NpgsqlConnection sqlConnection = dbAccess.GetSqlConnection();
+        id = Select_TreatmentTypeId_By_TreatmentName(sqlConnection, treatmentName);
+        if (id == -1) {
+          // 新規登録なら、ID割り当て
+          id = SelectMaxTreatmentId(sqlConnection);
+        }
+      } catch {
+      } finally {
+        // PostgreSQL Server 通信切断
+        dbAccess.CloseSqlConnection();
+      }
+
+      return id;
     }
 
     public static bool InsertTreatmentInfo(TreatmentInfoRec rec, NpgsqlConnection sqlConnection) {
@@ -257,6 +285,29 @@ namespace AxialManagerS_Converter.Controllers {
       stringBuilder.Append(";");
       using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(stringBuilder.ToString(), sqlConnection);
       npgsqlCommand.Parameters.AddWithValue(COLNAME_AxmTreatmentInfoList[0], treatmentType);
+      using NpgsqlDataReader npgsqlDataReader = npgsqlCommand.ExecuteReader();
+      while (npgsqlDataReader.Read()) {
+        result = _objectToInt(npgsqlDataReader[0]);
+      }
+
+      return result;
+    }
+
+    // 登録されている治療名称から、treatmenttype_idの有無を取得
+    public static int Select_TreatmentTypeId_By_TreatmentName(NpgsqlConnection sqlConnection, string treatmentName) {
+      int result = -1;
+      StringBuilder stringBuilder = new StringBuilder();
+      stringBuilder.Append("select ");
+      stringBuilder.Append(_col(COLNAME_AxmTreatmentInfoList[(int)eAxmTreatmentInfo.treatmenttype_id]));
+      stringBuilder.Append("from ");
+      stringBuilder.Append(_table(DB_TableNames[(int)eDbTable.AXM_TREATMENT_INFO]));
+      stringBuilder.Append("where ");
+      stringBuilder.Append(_col(COLNAME_AxmTreatmentInfoList[(int)eAxmTreatmentInfo.treatment_name]));
+      stringBuilder.Append(" = ");
+      stringBuilder.Append(_bind(COLNAME_AxmTreatmentInfoList[(int)eAxmTreatmentInfo.treatment_name]));
+      stringBuilder.Append(";");
+      using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(stringBuilder.ToString(), sqlConnection);
+      npgsqlCommand.Parameters.AddWithValue(COLNAME_AxmTreatmentInfoList[(int)eAxmTreatmentInfo.treatment_name], treatmentName);
       using NpgsqlDataReader npgsqlDataReader = npgsqlCommand.ExecuteReader();
       while (npgsqlDataReader.Read()) {
         result = _objectToInt(npgsqlDataReader[0]);
