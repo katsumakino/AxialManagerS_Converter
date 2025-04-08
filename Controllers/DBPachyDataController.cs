@@ -21,7 +21,6 @@ namespace AxialManagerS_Converter.Controllers {
           // PostgreSQL Server 通信接続
           NpgsqlConnection sqlConnection = dbAccess.GetSqlConnection();
 
-          // todo: 設定取得
           int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)DBConst.SelectType.average]) - 1;
 
           // クエリコマンド実行

@@ -9,10 +9,11 @@ namespace AxialManagerS_Converter.Controllers {
   public class DBKrtDataController {
 
     // ケラト測定値書込み
-    public void SetKrt(KrtList conditions) {
+    public void SetKrt(KrtList conditions, GeneralSetting? setting) {
       try {
         if (conditions == null) return;
         if (conditions.PatientID == null || conditions.PatientID == string.Empty) return;
+        if (setting == null) return;
 
         bool result = false;
         DBAccess dbAccess = DBAccess.GetInstance();
@@ -22,7 +23,7 @@ namespace AxialManagerS_Converter.Controllers {
           NpgsqlConnection sqlConnection = dbAccess.GetSqlConnection();
 
           // todo: 設定取得
-          int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)DBConst.SelectType.average]) - 1;
+          int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)setting.DisplaySetting.KrtSelectType]) - 1;
 
           // クエリコマンド実行
           // UUIDの有無を確認(true:update / false:insert)
@@ -40,6 +41,7 @@ namespace AxialManagerS_Converter.Controllers {
             // EXAM_KRTに保存(右眼測定値)
             var rec_krt_r = MakeKrtRec(exam_id_r,
                 DBConst.strEyeType[DBConst.eEyeType.RIGHT],
+                setting.DisplaySetting,
                 sqlConnection);
             rec_krt_r.k1_mm[selectId] = conditions.RK1_mm;
             rec_krt_r.k1_d[selectId] = conditions.RK1_d;
@@ -64,6 +66,7 @@ namespace AxialManagerS_Converter.Controllers {
             // EXAM_KRTに保存(左眼測定値)
             var rec_krt_l = MakeKrtRec(exam_id_l,
                 DBConst.strEyeType[DBConst.eEyeType.LEFT],
+                setting.DisplaySetting,
                 sqlConnection);
             rec_krt_l.k1_mm[selectId] = conditions.LK1_mm;
             rec_krt_l.k1_d[selectId] = conditions.LK1_d;
@@ -94,7 +97,7 @@ namespace AxialManagerS_Converter.Controllers {
       return;
     }
 
-    public static ExamKrtRec MakeKrtRec(int examId, string posEye, NpgsqlConnection sqlConnection) {
+    public static ExamKrtRec MakeKrtRec(int examId, string posEye, DisplaySettingClass displaySetting, NpgsqlConnection sqlConnection) {
 
       var recKrt = new ExamKrtRec();
       try {
@@ -105,10 +108,9 @@ namespace AxialManagerS_Converter.Controllers {
 
         recKrt.is_exam_data = false;
         recKrt.comment = ""; // タグが無いので空文字
-        recKrt.select_id = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)DBConst.SelectType.average]) - 1;
+        recKrt.select_id = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)displaySetting.KrtSelectType]) - 1;
 
-        // todo: 設定反映
-        recKrt.phi_id = Select_PhiId_By_PhiType(sqlConnection, DBConst.PHI_TYPE[(int)DBConst.PhiType.e3_0]);
+        recKrt.phi_id = Select_PhiId_By_PhiType(sqlConnection, DBConst.PHI_TYPE[(int)displaySetting.KrtPhiType]);
         recKrt.is_meas_auto = false; // false固定でよい
 
         recKrt.k1_mm = new List<double?>() { 0, 0, 0 };

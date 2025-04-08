@@ -9,10 +9,11 @@ namespace AxialManagerS_Converter.Controllers {
   public class DBRefDataController {
 
     // レフ(他覚)測定値書込み
-    public void SetRef(RefList conditions) {
+    public void SetRef(RefList conditions, GeneralSetting? setting) {
       try {
         if (conditions == null) return;
         if (conditions.PatientID == null || conditions.PatientID == string.Empty) return;
+        if(setting == null) return;
 
         bool result = false;
         DBAccess dbAccess = DBAccess.GetInstance();
@@ -21,8 +22,7 @@ namespace AxialManagerS_Converter.Controllers {
           // PostgreSQL Server 通信接続
           NpgsqlConnection sqlConnection = dbAccess.GetSqlConnection();
 
-          // todo: 設定取得
-          int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)DBConst.SelectType.average]) - 1;
+          int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)setting.DisplaySetting.RefSelectType]) - 1;
 
           // クエリコマンド実行
           // UUIDの有無を確認(true:update / false:insert)
@@ -40,6 +40,7 @@ namespace AxialManagerS_Converter.Controllers {
             // EXAM_Refに保存(右眼測定値)
             var rec_Ref_r = MakeRefRec(exam_id_r,
                 DBConst.strEyeType[DBConst.eEyeType.RIGHT],
+                setting.DisplaySetting.RefSelectType,
                 sqlConnection);
             rec_Ref_r.s_d[selectId] = conditions.RS_d;
             rec_Ref_r.c_d[selectId] = conditions.RC_d;
@@ -60,6 +61,7 @@ namespace AxialManagerS_Converter.Controllers {
             // EXAM_Refに保存(左眼測定値)
             var rec_Ref_l = MakeRefRec(exam_id_l,
                 DBConst.strEyeType[DBConst.eEyeType.LEFT],
+                setting.DisplaySetting.RefSelectType,
                 sqlConnection);
             rec_Ref_l.s_d[selectId] = conditions.LS_d;
             rec_Ref_l.c_d[selectId] = conditions.LC_d;
@@ -86,7 +88,7 @@ namespace AxialManagerS_Converter.Controllers {
       return;
     }
 
-    public static ExamRefRec MakeRefRec(int examId, string posEye, NpgsqlConnection sqlConnection) {
+    public static ExamRefRec MakeRefRec(int examId, string posEye, SelectType selectType, NpgsqlConnection sqlConnection) {
 
       var recRef = new ExamRefRec();
       try {
@@ -97,7 +99,7 @@ namespace AxialManagerS_Converter.Controllers {
 
         recRef.is_exam_data = false;
         recRef.comment = ""; // タグが無いので空文字
-        recRef.select_id = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)DBConst.SelectType.average]) - 1;
+        recRef.select_id = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)selectType]) - 1;
 
         recRef.is_meas_auto = false; // false固定でよい
 

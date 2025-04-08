@@ -10,10 +10,11 @@ namespace AxialManagerS_Converter.Controllers {
   public class DBAxialDataController {
 
     // 眼軸長測定値書込み
-    public void SetOptAxial(AxialList conditions) {
+    public void SetOptAxial(AxialList conditions, GeneralSetting? setting) {
       try {
         if (conditions == null) return;
         if (conditions.PatientID == null || conditions.PatientID == string.Empty) return;
+        if (setting == null) return;
 
         bool result = false;
         DBAccess dbAccess = DBAccess.GetInstance();
@@ -22,7 +23,6 @@ namespace AxialManagerS_Converter.Controllers {
           // PostgreSQL Server 通信接続
           NpgsqlConnection sqlConnection = dbAccess.GetSqlConnection();
 
-          // todo: 設定取得
           int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)DBConst.SelectType.average]) - 1;
 
           // クエリコマンド実行
@@ -40,8 +40,9 @@ namespace AxialManagerS_Converter.Controllers {
                 sqlConnection);
             // EXAM_OPTAXIALに保存(右眼測定値)
             var rec_optaxial_r = MakeOptaxialRec(exam_id_r,
-            DBConst.strEyeType[DBConst.eEyeType.RIGHT],
-                sqlConnection);
+              DBConst.strEyeType[DBConst.eEyeType.RIGHT],
+              setting.DisplaySetting.AxialFittingsType,
+              sqlConnection);
             rec_optaxial_r.axial_mm[selectId] = conditions.RAxial;
             rec_optaxial_r.is_exam_data = conditions.RAxial != null;
             rec_optaxial_r.measured_at = conditions.ExamDateTime;
@@ -57,8 +58,9 @@ namespace AxialManagerS_Converter.Controllers {
                 sqlConnection);
             // EXAM_OPTAXIALに保存(左眼測定値)
             var rec_optaxial_l = MakeOptaxialRec(exam_id_l,
-            DBConst.strEyeType[DBConst.eEyeType.LEFT],
-                sqlConnection);
+              DBConst.strEyeType[DBConst.eEyeType.LEFT],
+              setting.DisplaySetting.AxialFittingsType,
+              sqlConnection);
             rec_optaxial_l.axial_mm[selectId] = conditions.LAxial;
             rec_optaxial_l.is_exam_data = conditions.LAxial != null;
             rec_optaxial_l.measured_at = conditions.ExamDateTime;
@@ -81,11 +83,11 @@ namespace AxialManagerS_Converter.Controllers {
       return;
     }
 
-    public static ExamOptaxialRec MakeOptaxialRec(int examId, string posEye, NpgsqlConnection sqlConnection) {
-      // todo: 設定ファイルから情報取得
+    public static ExamOptaxialRec MakeOptaxialRec(int examId, string posEye, FittingsType fittingsType, NpgsqlConnection sqlConnection) {
+
       // todo: Target_EYESとFITTINGSのDBテーブルを入替
       int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)DBConst.SelectType.none]);
-      int fittingId = Select_FittingId_By_FittingType(sqlConnection, DBConst.FITTINGS_TYPE[(int)DBConst.FittingsType.none]);
+      int fittingId = Select_FittingId_By_FittingType(sqlConnection, DBConst.FITTINGS_TYPE[(int)fittingsType]);
       int targetEyeId = Select_TargetEyeId_By_TargetEyeType(sqlConnection, DBConst.TARGET_EYE_TYPE[(int)DBConst.TargetEyeType.none]);
 
       var recOpax = new ExamOptaxialRec();

@@ -12,6 +12,7 @@ namespace AxialManagerS_Converter.Components.Model {
     // todo: 設定ファイルのパスを確認(wwwroot?)
     private string settingDirTopPath = @"C:/TomeyApp/AxialManager2/Setting/";
     private readonly string settingFileName = "GeneralSetting.json";
+    private GeneralSetting? axm2Setting = new();
 
     // 旧AXM治療IDとAXM2治療IDの対比表
     class TreatmentIdTable {
@@ -47,7 +48,7 @@ namespace AxialManagerS_Converter.Components.Model {
 
         string destPath = Path.Combine(settingDirTopPath, settingFileName);
 
-        GeneralSetting? axm2Setting = new();
+        axm2Setting = new();
 
         if (utilities.FileExists(destPath)) {
           // AXM2の設定ファイル読出し
@@ -349,10 +350,8 @@ namespace AxialManagerS_Converter.Components.Model {
               axialList.IsRManualInput = manual;
               axialList.IsLManualInput = manual;
 
-              // todo: Table情報も渡す
-
               // DBに書込
-              dBAxialData.SetOptAxial(axialList);
+              dBAxialData.SetOptAxial(axialList, axm2Setting);
             }
           }
         }
@@ -431,13 +430,12 @@ namespace AxialManagerS_Converter.Components.Model {
               refList.IsRManualInput = manual;
               refList.IsLManualInput = manual;
 
-              // todo: Table情報も渡す
               if (table == Axm1PatientClass.eAxm1DbTable.refTable) {
                 // DBに書込(自覚値)
                 dBSciRefData.SetSciRef(refList);
               } else {
                 // DBに書込(他覚値)
-                dBRefData.SetRef(refList);
+                dBRefData.SetRef(refList, axm2Setting);
               }
             }
           }
@@ -511,10 +509,8 @@ namespace AxialManagerS_Converter.Components.Model {
               krtList.IsRManualInput = manual;
               krtList.IsLManualInput = manual;
 
-              // todo: Table情報も渡す
-
               // DBに書込
-              dBKrtData.SetKrt(krtList);
+              dBKrtData.SetKrt(krtList, axm2Setting);
             }
           }
         }
@@ -570,8 +566,6 @@ namespace AxialManagerS_Converter.Components.Model {
                 [(int)Axm1PatientClass.eAxm1KeratoTable.manual]].ToString() == "y");
               pachyList.IsRManualInput = manual;
               pachyList.IsLManualInput = manual;
-
-              // todo: Table情報も渡す
 
               // DBに書込
               dBPachyData.SetPachy(pachyList);
