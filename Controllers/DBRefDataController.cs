@@ -13,7 +13,7 @@ namespace AxialManagerS_Converter.Controllers {
       try {
         if (conditions == null) return;
         if (conditions.PatientID == null || conditions.PatientID == string.Empty) return;
-        if(setting == null) return;
+        if (setting == null) return;
 
         bool result = false;
         DBAccess dbAccess = DBAccess.GetInstance();
