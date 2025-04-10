@@ -35,6 +35,7 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.PACHY_CCT],
                 DBConst.eEyeType.RIGHT,
                 conditions.ExamDateTime,
+                conditions.IsRManualInput,
                 sqlConnection);
             // EXAM_Pachyに保存(右眼測定値)
             var rec_Pachy_r = MakePachyRec(exam_id_r,
@@ -52,6 +53,7 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.PACHY_CCT],
                 DBConst.eEyeType.LEFT,
                 conditions.ExamDateTime,
+                conditions.IsLManualInput,
                 sqlConnection);
             // EXAM_Pachyに保存(左眼測定値)
             var rec_Pachy_l = MakePachyRec(exam_id_l,

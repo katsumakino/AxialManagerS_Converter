@@ -105,7 +105,7 @@ namespace AxialManagerS_Converter.Controllers {
       return result != 0 ? result + 1 : 1;
     }
 
-    public static int RegisterExamList(string pt_uuid, string dataType, DBConst.eEyeType posEye, DateTime? exam_datetime, NpgsqlConnection sqlConnection) {
+    public static int RegisterExamList(string pt_uuid, string dataType, DBConst.eEyeType posEye, DateTime? exam_datetime, bool is_manual, NpgsqlConnection sqlConnection) {
       int retExamId = -1;
       var examrec = new ExamListRec();
       try {
@@ -116,15 +116,16 @@ namespace AxialManagerS_Converter.Controllers {
 
         examrec.pt_uuid = pt_uuid;
 
-        // todo:
-        // ログインユーザ名
-        //examrec.exam_operator_lastname = string.IsNullOrWhiteSpace(retLastName) ? "" : retLastName;
-        //examrec.exam_operator_firstname = string.IsNullOrWhiteSpace(retFirstName) ? "" : retFirstName;
         examrec.exam_operator_lastname = string.Empty;
         examrec.exam_operator_firstname = string.Empty;
 
         // デバイスID
-        examrec.device_id = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
+        // 変換器のみの対応。手入力では無いデータは、装置種別をAXMとして登録する
+        if (is_manual) {
+          examrec.device_id = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
+        } else {
+          examrec.device_id = Select_Device_ID(sqlConnection, DBConst.AxmOldDeviceType);
+        }
 
         // 検査日時
         examrec.measured_at = exam_datetime;

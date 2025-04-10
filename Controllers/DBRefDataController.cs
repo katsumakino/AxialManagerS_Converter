@@ -36,6 +36,7 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.REF],
                 DBConst.eEyeType.RIGHT,
                 conditions.ExamDateTime,
+                conditions.IsRManualInput,
                 sqlConnection);
             // EXAM_Refに保存(右眼測定値)
             var rec_Ref_r = MakeRefRec(exam_id_r,
@@ -57,6 +58,7 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.REF],
                 DBConst.eEyeType.LEFT,
                 conditions.ExamDateTime,
+                conditions.IsLManualInput,
                 sqlConnection);
             // EXAM_Refに保存(左眼測定値)
             var rec_Ref_l = MakeRefRec(exam_id_l,

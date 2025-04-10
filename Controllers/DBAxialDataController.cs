@@ -37,6 +37,7 @@ namespace AxialManagerS_Converter.Controllers {
             DBConst.strMstDataType[DBConst.eMSTDATATYPE.OPTAXIAL],
                 DBConst.eEyeType.RIGHT,
                 conditions.ExamDateTime,
+                conditions.IsRManualInput,
                 sqlConnection);
             // EXAM_OPTAXIALに保存(右眼測定値)
             var rec_optaxial_r = MakeOptaxialRec(exam_id_r,
@@ -52,9 +53,10 @@ namespace AxialManagerS_Converter.Controllers {
 
             // EXAM_LISTに保存(左眼測定値)
             var exam_id_l = RegisterExamList(uuid,
-            DBConst.strMstDataType[DBConst.eMSTDATATYPE.OPTAXIAL],
-            DBConst.eEyeType.LEFT,
+                DBConst.strMstDataType[DBConst.eMSTDATATYPE.OPTAXIAL],
+                DBConst.eEyeType.LEFT,
                 conditions.ExamDateTime,
+                conditions.IsLManualInput,
                 sqlConnection);
             // EXAM_OPTAXIALに保存(左眼測定値)
             var rec_optaxial_l = MakeOptaxialRec(exam_id_l,

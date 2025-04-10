@@ -258,6 +258,7 @@
     #endregion
 
     public static string AxmDeviceType = "AXM2";
+    public static string AxmOldDeviceType = "AXM";
 
     public static string[] AXIAL_DEVICE_TYPE = ["none", "OA1", "OA-2000", "AXM2"];
 

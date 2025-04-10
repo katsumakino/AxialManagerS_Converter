@@ -37,6 +37,7 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.KRT],
                 DBConst.eEyeType.RIGHT,
                 conditions.ExamDateTime,
+                conditions.IsRManualInput,
                 sqlConnection);
             // EXAM_KRTに保存(右眼測定値)
             var rec_krt_r = MakeKrtRec(exam_id_r,
@@ -62,6 +63,7 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.KRT],
                 DBConst.eEyeType.LEFT,
                 conditions.ExamDateTime,
+                conditions.IsLManualInput,
                 sqlConnection);
             // EXAM_KRTに保存(左眼測定値)
             var rec_krt_l = MakeKrtRec(exam_id_l,
