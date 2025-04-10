@@ -20,6 +20,7 @@ namespace AxialManagerS_Converter.Controllers {
         try {
           // PostgreSQL Server 通信接続
           NpgsqlConnection sqlConnection = dbAccess.GetSqlConnection();
+          int deviceId = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
 
           // クエリコマンド実行
           // UUIDの有無を確認(true:update / false:insert)
@@ -33,11 +34,12 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.SCI_REF],
                 DBConst.eEyeType.RIGHT,
                 conditions.ExamDateTime,
-                true,
+                deviceId,
                 sqlConnection);
             // EXAM_Refに保存(右眼測定値)
             var rec_Ref_r = MakeRefRec(exam_id_r,
                 DBConst.strEyeType[DBConst.eEyeType.RIGHT],
+                deviceId,
                 sqlConnection);
             rec_Ref_r.s_d = conditions.RS_d;
             rec_Ref_r.c_d = conditions.RC_d;
@@ -54,11 +56,12 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.SCI_REF],
                 DBConst.eEyeType.LEFT,
                 conditions.ExamDateTime,
-                true,
+                deviceId,
                 sqlConnection);
             // EXAM_Refに保存(左眼測定値)
             var rec_Ref_l = MakeRefRec(exam_id_l,
                 DBConst.strEyeType[DBConst.eEyeType.LEFT],
+                deviceId,
                 sqlConnection);
             rec_Ref_l.s_d = conditions.LS_d;
             rec_Ref_l.c_d = conditions.LC_d;
@@ -85,14 +88,14 @@ namespace AxialManagerS_Converter.Controllers {
       return;
     }
 
-    public static ExamSciRefRec MakeRefRec(int examId, string posEye, NpgsqlConnection sqlConnection) {
+    public static ExamSciRefRec MakeRefRec(int examId, string posEye, int deviceId, NpgsqlConnection sqlConnection) {
 
       var recRef = new ExamSciRefRec();
       try {
         recRef.exam_id = examId;
         recRef.examtype_id = Select_Examtype_ID(sqlConnection, DBConst.strMstDataType[DBConst.eMSTDATATYPE.SCI_REF]);
         recRef.eye_id = Select_Eye_ID(sqlConnection, posEye);
-        recRef.device_id = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
+        recRef.device_id = deviceId;
 
         recRef.is_exam_data = true;
         recRef.comment = "";

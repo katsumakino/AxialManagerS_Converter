@@ -1,13 +1,26 @@
 ﻿using AxialManagerS_Converter.Common;
 using AxialManagerS_Converter.Controllers;
 using AxialManagerS_Converter.Converter;
-using System;
 using System.Data.SQLite;
 using System.IO;
 using System.Text.Json;
 
 namespace AxialManagerS_Converter.Components.Model {
   public class ConvertWindowModel {
+
+    // DB検索条件のプロパティ設定
+    public readonly int examYearRangeMin = 2015;
+    public readonly int examYearRangeMax = DateTime.Now.Year;
+    public int examYearMin = 2015;
+    public int examYearMax = DateTime.Now.Year;
+
+    public readonly int ageRangeMin = 0;
+    public readonly int ageRangeMax = 120;
+    public int ageMin = 6;
+    public int ageMax = 22;
+
+    public bool setExamYearRange = false;
+    public bool setAgeRange = false;
 
     // todo: 設定ファイルのパスを確認(wwwroot?)
     private string settingDirTopPath = @"C:/TomeyApp/AxialManager2/Setting/";
@@ -233,14 +246,8 @@ namespace AxialManagerS_Converter.Components.Model {
         using (var connection = new SQLiteConnection($"Data Source={dbFilePath};Version=3;")) {
           connection.Open();
 
+          ConvertMedicalSetupTable(connection);
           ConvertPatientInfoTable(connection);
-          ConvertAxialTable(connection, Axm1PatientClass.eAxm1DbTable.axialTable);
-          ConvertRefTable(connection, Axm1PatientClass.eAxm1DbTable.refObjTable);
-          ConvertKrtTable(connection, Axm1PatientClass.eAxm1DbTable.keratoTable);
-          ConvertPachyTable(connection, Axm1PatientClass.eAxm1DbTable.pachyTable);
-          ConvertMedicalSetupTable(connection, Axm1PatientClass.eAxm1DbTable.medicalSetupTable);
-          ConvertMedicalTreatmentTable(connection, Axm1PatientClass.eAxm1DbTable.medicalTreatmentTable);
-
         }
       } catch {
       } finally { }
@@ -260,9 +267,19 @@ namespace AxialManagerS_Converter.Components.Model {
 
       DBPatientInfoController dbPatientInfo = new();
 
+      DateOnly birthMin = DBCommonController.CalculateBirthDateFromAge(ageMin);
+      DateOnly birthMax = DBCommonController.CalculateBirthDateFromAge(ageMax, true);
+      string yearMin = examYearMin.ToString() + "/01/01";
+      string yearMax = examYearMax.ToString() + "/12/31";
+
       try {
         string sql = "SELECT * FROM " + Axm1PatientClass.Axm1DB_TableNames[(int)Axm1PatientClass.eAxm1DbTable.patientInfoTable];
         sql += " WHERE ID = '123456789'"; // todo: test確認用
+        if(setAgeRange) {
+          //sql += "WHERE Birth BETWEEN";
+          sql += " AND Birth BETWEEN";
+          sql += (" '" + birthMax.ToString("yyyy/MM/dd") + "' AND '" + birthMin.ToString("yyyy/MM/dd") + "'");
+        }
         using (var command = new SQLiteCommand(sql, connection)) {
           using (var reader = command.ExecuteReader()) {
             while (reader.Read()) {
@@ -294,6 +311,13 @@ namespace AxialManagerS_Converter.Components.Model {
 
               // DBに書込
               dbPatientInfo.SetPatientInfo(patientInfo);
+
+              ConvertAxialTable(connection, patientInfo.ID, yearMin, yearMax);
+              ConvertRefTable(connection, patientInfo.ID, yearMin, yearMax, true);
+              ConvertRefTable(connection, patientInfo.ID, yearMin, yearMax, false);
+              ConvertKrtTable(connection, patientInfo.ID, yearMin, yearMax);
+              ConvertPachyTable(connection, patientInfo.ID, yearMin, yearMax);
+              ConvertMedicalTreatmentTable(connection, patientInfo.ID);
             }
           }
         }
@@ -310,11 +334,29 @@ namespace AxialManagerS_Converter.Components.Model {
     /// <param name="connection"></param>
     /// <param name="table"></param>
     /// <returns></returns>
-    private bool ConvertAxialTable(SQLiteConnection connection, Axm1PatientClass.eAxm1DbTable table) {
+    private bool ConvertAxialTable(SQLiteConnection connection, string pt_id, string min, string max) {
 
-      if (table < Axm1PatientClass.eAxm1DbTable.axialTable
-        || table > Axm1PatientClass.eAxm1DbTable.axialOptLengthTable) {
+      if (axm2Setting == null) {
         return false;
+      }
+
+      Axm1PatientClass.eAxm1DbTable table;
+
+      switch (axm2Setting.DisplaySetting.AxialFittingsType) {
+        case FittingsType.Contact:
+          table = Axm1PatientClass.eAxm1DbTable.axialContactTable;
+          break;
+        case FittingsType.Contact2:
+          table = Axm1PatientClass.eAxm1DbTable.axialContact2Table;
+          break;
+        case FittingsType.OptLength:
+          table = Axm1PatientClass.eAxm1DbTable.axialOptLengthTable;
+          break;
+        case FittingsType.Immersion:
+          table = Axm1PatientClass.eAxm1DbTable.axialTable;
+          break;
+        default:
+          return false;
       }
 
       string st_dt;
@@ -326,7 +368,11 @@ namespace AxialManagerS_Converter.Components.Model {
 
       try {
         string sql = "SELECT * FROM " + Axm1PatientClass.Axm1DB_TableNames[(int)table];
-        sql += " WHERE ID = '123456789'"; // todo: test確認用
+        sql += (" WHERE ID = '" + pt_id + "'");
+        if (setExamYearRange) {
+          sql += " AND ST_DT BETWEEN";
+          sql += (" '" + max + "' AND '" + min + "'");
+        }
         using (var command = new SQLiteCommand(sql, connection)) {
           using (var reader = command.ExecuteReader()) {
             while (reader.Read()) {
@@ -368,11 +414,26 @@ namespace AxialManagerS_Converter.Components.Model {
     /// <param name="connection"></param>
     /// <param name="table"></param>
     /// <returns></returns>
-    private bool ConvertRefTable(SQLiteConnection connection, Axm1PatientClass.eAxm1DbTable table) {
+    private bool ConvertRefTable(SQLiteConnection connection, string pt_id, string min, string max, bool isObj) {
 
-      if (table < Axm1PatientClass.eAxm1DbTable.refObjTable
-        || table > Axm1PatientClass.eAxm1DbTable.refTable) {
+      if (axm2Setting == null) {
         return false;
+      }
+
+      Axm1PatientClass.eAxm1DbTable table;
+      if (isObj) {
+        switch (axm2Setting.DisplaySetting.RefSelectType) {
+          case SelectType.Average:
+            table = Axm1PatientClass.eAxm1DbTable.refObjTable;
+            break;
+          case SelectType.Median:
+            table = Axm1PatientClass.eAxm1DbTable.refObjTypTable;
+            break;
+          default:
+            return false;
+        }
+      } else {
+        table = Axm1PatientClass.eAxm1DbTable.refTable;
       }
 
       string st_dt;
@@ -389,7 +450,11 @@ namespace AxialManagerS_Converter.Components.Model {
 
       try {
         string sql = "SELECT * FROM " + Axm1PatientClass.Axm1DB_TableNames[(int)table];
-        sql += " WHERE ID = '123456789'"; // todo: test確認用
+        sql += (" WHERE ID = '" + pt_id + "'");
+        if (setExamYearRange) {
+          sql += " AND ST_DT BETWEEN";
+          sql += (" '" + max + "' AND '" + min + "'");
+        }
         using (var command = new SQLiteCommand(sql, connection)) {
           using (var reader = command.ExecuteReader()) {
             while (reader.Read()) {
@@ -453,11 +518,89 @@ namespace AxialManagerS_Converter.Components.Model {
     /// <param name="connection"></param>
     /// <param name="table"></param>
     /// <returns></returns>
-    private bool ConvertKrtTable(SQLiteConnection connection, Axm1PatientClass.eAxm1DbTable table) {
+    private bool ConvertKrtTable(SQLiteConnection connection, string pt_id, string min, string max) {
 
-      if (table < Axm1PatientClass.eAxm1DbTable.keratoTable
-        || table > Axm1PatientClass.eAxm1DbTable.keratoOA20TypTable) {
+      if (axm2Setting == null) {
         return false;
+      }
+
+      Axm1PatientClass.eAxm1DbTable table;
+
+      switch (axm2Setting.DisplaySetting.KrtSelectType) {
+        case SelectType.Average:
+          switch (axm2Setting.DisplaySetting.KrtDeviceType) {
+            case KrtDeviceType.OA2000:
+              switch (axm2Setting.DisplaySetting.KrtPhiType) {
+                case PhiType.Phi2_0:
+                  table = Axm1PatientClass.eAxm1DbTable.keratoOA20Table;
+                  break;
+                case PhiType.Phi2_5:
+                  table = Axm1PatientClass.eAxm1DbTable.keratoOA25Table;
+                  break;
+                case PhiType.Phi3_0:
+                  table = Axm1PatientClass.eAxm1DbTable.keratoOATable;
+                  break;
+                default:
+                  return false;
+              }
+              break;
+            case KrtDeviceType.MR:
+              switch (axm2Setting.DisplaySetting.KrtPhiType) {
+                case PhiType.Phi2_0:
+                  table = Axm1PatientClass.eAxm1DbTable.kerato20Table;
+                  break;
+                case PhiType.Phi2_5:
+                  table = Axm1PatientClass.eAxm1DbTable.kerato25Table;
+                  break;
+                case PhiType.Phi3_0:
+                  table = Axm1PatientClass.eAxm1DbTable.keratoTable;
+                  break;
+                default:
+                  return false;
+              }
+              break;
+            default:
+              return false;
+          }
+          break;
+        case SelectType.Median:
+          switch (axm2Setting.DisplaySetting.KrtDeviceType) {
+            case KrtDeviceType.OA2000:
+              switch (axm2Setting.DisplaySetting.KrtPhiType) {
+                case PhiType.Phi2_0:
+                  table = Axm1PatientClass.eAxm1DbTable.keratoOA20TypTable;
+                  break;
+                case PhiType.Phi2_5:
+                  table = Axm1PatientClass.eAxm1DbTable.keratoOA25TypTable;
+                  break;
+                case PhiType.Phi3_0:
+                  table = Axm1PatientClass.eAxm1DbTable.keratoOATypTable;
+                  break;
+                default:
+                  return false;
+              }
+              break;
+            case KrtDeviceType.MR:
+              switch (axm2Setting.DisplaySetting.KrtPhiType) {
+                case PhiType.Phi2_0:
+                  table = Axm1PatientClass.eAxm1DbTable.kerato20TypTable;
+                  break;
+                case PhiType.Phi2_5:
+                  table = Axm1PatientClass.eAxm1DbTable.kerato25TypTable;
+                  break;
+                case PhiType.Phi3_0:
+                  table = Axm1PatientClass.eAxm1DbTable.keratoTypTable;
+                  break;
+                default:
+                  return false;
+              }
+              break;
+            default:
+              return false;
+          }
+          break;
+        default:
+          return false;
       }
 
       string st_dt;
@@ -473,7 +616,11 @@ namespace AxialManagerS_Converter.Components.Model {
 
       try {
         string sql = "SELECT * FROM " + Axm1PatientClass.Axm1DB_TableNames[(int)table];
-        sql += " WHERE ID = '123456789'"; // todo: test確認用
+        sql += (" WHERE ID = '" + pt_id + "'");
+        if (setExamYearRange) {
+          sql += " AND ST_DT BETWEEN";
+          sql += (" '" + max + "' AND '" + min + "'");
+        }
         using (var command = new SQLiteCommand(sql, connection)) {
           using (var reader = command.ExecuteReader()) {
             while (reader.Read()) {
@@ -527,11 +674,23 @@ namespace AxialManagerS_Converter.Components.Model {
     /// <param name="connection"></param>
     /// <param name="table"></param>
     /// <returns></returns>
-    private bool ConvertPachyTable(SQLiteConnection connection, Axm1PatientClass.eAxm1DbTable table) {
+    private bool ConvertPachyTable(SQLiteConnection connection, string pt_id, string min, string max) {
 
-      if (table < Axm1PatientClass.eAxm1DbTable.pachyTable
-        || table > Axm1PatientClass.eAxm1DbTable.pachyMRTable) {
+      if (axm2Setting == null) {
         return false;
+      }
+
+      Axm1PatientClass.eAxm1DbTable table;
+
+      switch (axm2Setting.DisplaySetting.PachyDeviceType) {
+        case PachyDeviceType.OA2000:
+          table = Axm1PatientClass.eAxm1DbTable.pachyTable;
+          break;
+        case PachyDeviceType.MR:
+          table = Axm1PatientClass.eAxm1DbTable.pachyMRTable;
+          break;
+        default:
+          return false;
       }
 
       string st_dt;
@@ -543,7 +702,11 @@ namespace AxialManagerS_Converter.Components.Model {
 
       try {
         string sql = "SELECT * FROM " + Axm1PatientClass.Axm1DB_TableNames[(int)table];
-        sql += " WHERE ID = '123456789'"; // todo: test確認用
+        sql += (" WHERE ID = '" + pt_id + "'");
+        if (setExamYearRange) {
+          sql += " AND ST_DT BETWEEN";
+          sql += (" '" + max + "' AND '" + min + "'");
+        }
         using (var command = new SQLiteCommand(sql, connection)) {
           using (var reader = command.ExecuteReader()) {
             while (reader.Read()) {
@@ -585,11 +748,9 @@ namespace AxialManagerS_Converter.Components.Model {
     /// <param name="connection"></param>
     /// <param name="table"></param>
     /// <returns></returns>
-    private bool ConvertMedicalSetupTable(SQLiteConnection connection, Axm1PatientClass.eAxm1DbTable table) {
+    private bool ConvertMedicalSetupTable(SQLiteConnection connection) {
 
-      if (table != Axm1PatientClass.eAxm1DbTable.medicalSetupTable) {
-        return false;
-      }
+      Axm1PatientClass.eAxm1DbTable table = Axm1PatientClass.eAxm1DbTable.medicalSetupTable;
 
       string? id;
       string? colorR;
@@ -652,13 +813,11 @@ namespace AxialManagerS_Converter.Components.Model {
     /// <param name="connection"></param>
     /// <param name="table"></param>
     /// <returns></returns>
-    private bool ConvertMedicalTreatmentTable(SQLiteConnection connection, Axm1PatientClass.eAxm1DbTable table) {
+    private bool ConvertMedicalTreatmentTable(SQLiteConnection connection, string pt_id) {
 
-      if (table != Axm1PatientClass.eAxm1DbTable.medicalTreatmentTable) {
-        return false;
-      }
+      Axm1PatientClass.eAxm1DbTable table = Axm1PatientClass.eAxm1DbTable.medicalTreatmentTable;
 
-      if(treatmentIdList.Count == 0) {
+      if (treatmentIdList.Count == 0) {
         // 治療方法テーブルの変換が行われていない
         return false;
       }
@@ -673,7 +832,7 @@ namespace AxialManagerS_Converter.Components.Model {
 
       try {
         string sql = "SELECT * FROM " + Axm1PatientClass.Axm1DB_TableNames[(int)table];
-        sql += " WHERE MEDICAL = 'Atropine'"; // todo: test確認用
+        sql += (" WHERE ID = '" + pt_id + "'");
         using (var command = new SQLiteCommand(sql, connection)) {
           using (var reader = command.ExecuteReader()) {
             while (reader.Read()) {
@@ -696,14 +855,14 @@ namespace AxialManagerS_Converter.Components.Model {
 
               // ID変換(string -> int)
               treatId = GetAxm2IdByAxm1Id(treatmentIdList, medical);
-              if(treatId != null) {
+              if (treatId != null) {
                 treatmentList.TreatID = (int)treatId;
               } else {
                 continue;
               }
 
               // 被検者IDを取得
-              if(id == null || id == string.Empty) {
+              if (id == null || id == string.Empty) {
                 continue;
               }
               treatmentDataRequest.PatientID = id;

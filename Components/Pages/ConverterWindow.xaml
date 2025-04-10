@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AxialManagerS_Converter.Components.Pages"
+        xmlns:nud="clr-namespace:AxialManagerS_Converter.Components.Parts"
 		xmlns:viewmodel="clr-namespace:AxialManagerS_Converter.Components.ViewModel"
         mc:Ignorable="d"
-        Height="450" Width="800">
+        Height="500" Width="800">
 	<UserControl.DataContext>
 		<viewmodel:ConverterWindowVM x:Name="vm"/>
 	</UserControl.DataContext>
@@ -33,9 +34,68 @@
 					Style="{StaticResource Standard_Button}"
 					Width="100" Height="50" HorizontalAlignment="Left"
 					Click="SelectButton_Click"/>
+			<Label Style="{StaticResource Standard_Label}"
+				   Content="測定日範囲:" Width="150" Height="50"
+				   HorizontalAlignment="Left" VerticalAlignment="Center"/>
+			<StackPanel Orientation="Horizontal">
+				<CheckBox x:Name="ExamDateRangeCheckBox"
+						  Style="{StaticResource Standard_CheckBox}"
+						  Width="20" Height="20" Margin="5"
+						  IsChecked="{Binding SetExamYearRange}"/>
+				<nud:PartsNumericUpDown x:Name="ExamDateRangeMin"
+										Width="100" Height="50" Margin="5"
+										IsEnabled="{Binding IsChecked, ElementName=ExamDateRangeCheckBox}"
+										MyValue="{Binding ExamYearMin}"
+										MyMin="{Binding ExamYearRangeMin}"
+										MyMax="{Binding ExamYearRangeMax}"
+										MyStep="1"
+										MyKetaRear="0"/>
+				<Label Style="{StaticResource Standard_Label}"
+						Content=" ～ " Width="50" Height="50"
+						HorizontalAlignment="Left" VerticalAlignment="Center"
+						HorizontalContentAlignment="Center"/>
+				<nud:PartsNumericUpDown x:Name="ExamDateRangeMax"
+									Width="100" Height="50" Margin="5"
+									IsEnabled="{Binding IsChecked, ElementName=ExamDateRangeCheckBox}"
+									MyValue="{Binding ExamYearMax}"
+									MyMin="{Binding ExamYearRangeMin}"
+									MyMax="{Binding ExamYearRangeMax}"
+									MyStep="1"
+									MyKetaRear="0"/>
+			</StackPanel>
+			<Label Style="{StaticResource Standard_Label}"
+					Content="年齢範囲:" Width="150" Height="50"
+					HorizontalAlignment="Left" VerticalAlignment="Center"/>
+			<StackPanel Orientation="Horizontal">
+				<CheckBox x:Name="AgeRangeCheckBox"
+						  Style="{StaticResource Standard_CheckBox}"
+						  Width="20" Height="20" Margin="5"
+						  IsChecked="{Binding SetAgeRange}"/>
+				<nud:PartsNumericUpDown x:Name="AgeRangeMin"
+							Width="100" Height="50" Margin="5"
+							IsEnabled="{Binding IsChecked, ElementName=AgeRangeCheckBox}"
+							MyValue="{Binding AgeMin}"
+							MyMin="{Binding AgeRangeMin}"
+							MyMax="{Binding AgeRangeMax}"
+							MyStep="1"
+							MyKetaRear="0"/>
+				<Label Style="{StaticResource Standard_Label}"
+						Content=" ～ " Width="50" Height="50"
+						HorizontalAlignment="Left" VerticalAlignment="Center"
+						HorizontalContentAlignment="Center"/>
+				<nud:PartsNumericUpDown x:Name="AgeRangeMax"
+						Width="100" Height="50" Margin="5"
+						IsEnabled="{Binding IsChecked, ElementName=AgeRangeCheckBox}"
+						MyValue="{Binding AgeMax}"
+						MyMin="{Binding AgeRangeMin}"
+						MyMax="{Binding AgeRangeMax}"
+						MyStep="1"
+						MyKetaRear="0"/>
+			</StackPanel>
 			<Button x:Name="SettingConvertButton" Content="Convert"
 					Style="{StaticResource Standard_Button}"
 					Width="100" Height="50" HorizontalAlignment="Left"
+					Margin="0,5,0,0"
 					Click="SettingConvertButton_Click"/>
 			<Button x:Name="FinishButton" Content="Finish"
 					Style="{StaticResource Standard_Button}"

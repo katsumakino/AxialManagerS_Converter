@@ -22,6 +22,7 @@ namespace AxialManagerS_Converter.Controllers {
           NpgsqlConnection sqlConnection = dbAccess.GetSqlConnection();
 
           int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)DBConst.SelectType.average]) - 1;
+          int deviceId = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
 
           // クエリコマンド実行
           // UUIDの有無を確認(true:update / false:insert)
@@ -35,11 +36,12 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.PACHY_CCT],
                 DBConst.eEyeType.RIGHT,
                 conditions.ExamDateTime,
-                conditions.IsRManualInput,
+                deviceId,
                 sqlConnection);
             // EXAM_Pachyに保存(右眼測定値)
             var rec_Pachy_r = MakePachyRec(exam_id_r,
                 DBConst.strEyeType[DBConst.eEyeType.RIGHT],
+                deviceId,
                 sqlConnection);
             rec_Pachy_r.pachy_um[selectId] = conditions.RPachy;
             rec_Pachy_r.is_exam_data = conditions.RPachy != null;
@@ -53,11 +55,12 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.PACHY_CCT],
                 DBConst.eEyeType.LEFT,
                 conditions.ExamDateTime,
-                conditions.IsLManualInput,
+                deviceId,
                 sqlConnection);
             // EXAM_Pachyに保存(左眼測定値)
             var rec_Pachy_l = MakePachyRec(exam_id_l,
                 DBConst.strEyeType[DBConst.eEyeType.LEFT],
+                deviceId,
                 sqlConnection);
             rec_Pachy_l.pachy_um[selectId] = conditions.LPachy;
             rec_Pachy_l.is_exam_data = conditions.LPachy != null;
@@ -81,7 +84,7 @@ namespace AxialManagerS_Converter.Controllers {
       return;
     }
 
-    public static ExamPachyRec MakePachyRec(int examId, string posEye, NpgsqlConnection sqlConnection) {
+    public static ExamPachyRec MakePachyRec(int examId, string posEye, int deviceId, NpgsqlConnection sqlConnection) {
 
       var recPachy = new ExamPachyRec();
       try {
@@ -94,7 +97,7 @@ namespace AxialManagerS_Converter.Controllers {
         recPachy.exam_id = examId;
         recPachy.examtype_id = Select_Examtype_ID(sqlConnection, DBConst.strMstDataType[DBConst.eMSTDATATYPE.PACHY_CCT]);
         recPachy.eye_id = Select_Eye_ID(sqlConnection, posEye);
-        recPachy.device_id = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
+        recPachy.device_id = deviceId;
 
         recPachy.is_exam_data = false;
         recPachy.comment = ""; // タグが無いので空文字

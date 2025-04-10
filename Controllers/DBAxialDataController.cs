@@ -24,7 +24,13 @@ namespace AxialManagerS_Converter.Controllers {
           NpgsqlConnection sqlConnection = dbAccess.GetSqlConnection();
 
           int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)DBConst.SelectType.average]) - 1;
-
+          int deviceId;
+          if (conditions.IsRManualInput || conditions.IsLManualInput) {
+            deviceId = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
+          } else {
+            deviceId = Select_Device_ID(sqlConnection, DBConst.AxmOldDeviceType);
+          }
+          
           // クエリコマンド実行
           // UUIDの有無を確認(true:update / false:insert)
           var uuid = Select_PTUUID_by_PTID(sqlConnection, conditions.PatientID);
@@ -37,12 +43,13 @@ namespace AxialManagerS_Converter.Controllers {
             DBConst.strMstDataType[DBConst.eMSTDATATYPE.OPTAXIAL],
                 DBConst.eEyeType.RIGHT,
                 conditions.ExamDateTime,
-                conditions.IsRManualInput,
+                deviceId,
                 sqlConnection);
             // EXAM_OPTAXIALに保存(右眼測定値)
             var rec_optaxial_r = MakeOptaxialRec(exam_id_r,
               DBConst.strEyeType[DBConst.eEyeType.RIGHT],
               setting.DisplaySetting.AxialFittingsType,
+              deviceId,
               sqlConnection);
             rec_optaxial_r.axial_mm[selectId] = conditions.RAxial;
             rec_optaxial_r.is_exam_data = conditions.RAxial != null;
@@ -56,12 +63,13 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.OPTAXIAL],
                 DBConst.eEyeType.LEFT,
                 conditions.ExamDateTime,
-                conditions.IsLManualInput,
+                deviceId,
                 sqlConnection);
             // EXAM_OPTAXIALに保存(左眼測定値)
             var rec_optaxial_l = MakeOptaxialRec(exam_id_l,
               DBConst.strEyeType[DBConst.eEyeType.LEFT],
               setting.DisplaySetting.AxialFittingsType,
+              deviceId,
               sqlConnection);
             rec_optaxial_l.axial_mm[selectId] = conditions.LAxial;
             rec_optaxial_l.is_exam_data = conditions.LAxial != null;
@@ -85,19 +93,21 @@ namespace AxialManagerS_Converter.Controllers {
       return;
     }
 
-    public static ExamOptaxialRec MakeOptaxialRec(int examId, string posEye, FittingsType fittingsType, NpgsqlConnection sqlConnection) {
+    public static ExamOptaxialRec MakeOptaxialRec(int examId, string posEye, FittingsType fittingsType, int deviceId, NpgsqlConnection sqlConnection) {
 
       // todo: Target_EYESとFITTINGSのDBテーブルを入替
       int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)DBConst.SelectType.none]);
-      int fittingId = Select_FittingId_By_FittingType(sqlConnection, DBConst.FITTINGS_TYPE[(int)fittingsType]);
-      int targetEyeId = Select_TargetEyeId_By_TargetEyeType(sqlConnection, DBConst.TARGET_EYE_TYPE[(int)DBConst.TargetEyeType.none]);
+      //int fittingId = Select_FittingId_By_FittingType(sqlConnection, DBConst.FITTINGS_TYPE[(int)fittingsType]);
+      //int targetEyeId = Select_TargetEyeId_By_TargetEyeType(sqlConnection, DBConst.TARGET_EYE_TYPE[(int)DBConst.TargetEyeType.none]);
+      int fittingId = Select_FittingId_By_FittingType(sqlConnection, DBConst.TARGET_EYE_TYPE[(int)DBConst.TargetEyeType.none]);
+      int targetEyeId = Select_TargetEyeId_By_TargetEyeType(sqlConnection, DBConst.FITTINGS_TYPE[(int)fittingsType]);
 
       var recOpax = new ExamOptaxialRec();
       try {
         recOpax.exam_id = examId;
         recOpax.examtype_id = Select_Examtype_ID(sqlConnection, DBConst.strMstDataType[DBConst.eMSTDATATYPE.OPTAXIAL]);
         recOpax.eye_id = Select_Eye_ID(sqlConnection, posEye);
-        recOpax.device_id = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
+        recOpax.device_id = deviceId;
         recOpax.is_exam_data = true;
         recOpax.comment = string.Empty;
         recOpax.select_id = selectId;

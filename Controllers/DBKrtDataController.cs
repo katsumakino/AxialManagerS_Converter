@@ -22,8 +22,8 @@ namespace AxialManagerS_Converter.Controllers {
           // PostgreSQL Server 通信接続
           NpgsqlConnection sqlConnection = dbAccess.GetSqlConnection();
 
-          // todo: 設定取得
           int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)setting.DisplaySetting.KrtSelectType]) - 1;
+          int deviceId = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
 
           // クエリコマンド実行
           // UUIDの有無を確認(true:update / false:insert)
@@ -37,12 +37,13 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.KRT],
                 DBConst.eEyeType.RIGHT,
                 conditions.ExamDateTime,
-                conditions.IsRManualInput,
+                deviceId,
                 sqlConnection);
             // EXAM_KRTに保存(右眼測定値)
             var rec_krt_r = MakeKrtRec(exam_id_r,
                 DBConst.strEyeType[DBConst.eEyeType.RIGHT],
                 setting.DisplaySetting,
+                deviceId,
                 sqlConnection);
             rec_krt_r.k1_mm[selectId] = conditions.RK1_mm;
             rec_krt_r.k1_d[selectId] = conditions.RK1_d;
@@ -63,12 +64,13 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.KRT],
                 DBConst.eEyeType.LEFT,
                 conditions.ExamDateTime,
-                conditions.IsLManualInput,
+                deviceId,
                 sqlConnection);
             // EXAM_KRTに保存(左眼測定値)
             var rec_krt_l = MakeKrtRec(exam_id_l,
                 DBConst.strEyeType[DBConst.eEyeType.LEFT],
                 setting.DisplaySetting,
+                deviceId,
                 sqlConnection);
             rec_krt_l.k1_mm[selectId] = conditions.LK1_mm;
             rec_krt_l.k1_d[selectId] = conditions.LK1_d;
@@ -99,14 +101,14 @@ namespace AxialManagerS_Converter.Controllers {
       return;
     }
 
-    public static ExamKrtRec MakeKrtRec(int examId, string posEye, DisplaySettingClass displaySetting, NpgsqlConnection sqlConnection) {
+    public static ExamKrtRec MakeKrtRec(int examId, string posEye, DisplaySettingClass displaySetting, int deviceId, NpgsqlConnection sqlConnection) {
 
       var recKrt = new ExamKrtRec();
       try {
         recKrt.exam_id = examId;
         recKrt.examtype_id = Select_Examtype_ID(sqlConnection, DBConst.strMstDataType[DBConst.eMSTDATATYPE.KRT]);
         recKrt.eye_id = Select_Eye_ID(sqlConnection, posEye);
-        recKrt.device_id = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
+        recKrt.device_id = deviceId;
 
         recKrt.is_exam_data = false;
         recKrt.comment = ""; // タグが無いので空文字

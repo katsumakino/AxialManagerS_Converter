@@ -23,6 +23,7 @@ namespace AxialManagerS_Converter.Controllers {
           NpgsqlConnection sqlConnection = dbAccess.GetSqlConnection();
 
           int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)setting.DisplaySetting.RefSelectType]) - 1;
+          int deviceId = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
 
           // クエリコマンド実行
           // UUIDの有無を確認(true:update / false:insert)
@@ -36,12 +37,13 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.REF],
                 DBConst.eEyeType.RIGHT,
                 conditions.ExamDateTime,
-                conditions.IsRManualInput,
+                deviceId,
                 sqlConnection);
             // EXAM_Refに保存(右眼測定値)
             var rec_Ref_r = MakeRefRec(exam_id_r,
                 DBConst.strEyeType[DBConst.eEyeType.RIGHT],
                 setting.DisplaySetting.RefSelectType,
+                deviceId,
                 sqlConnection);
             rec_Ref_r.s_d[selectId] = conditions.RS_d;
             rec_Ref_r.c_d[selectId] = conditions.RC_d;
@@ -58,12 +60,13 @@ namespace AxialManagerS_Converter.Controllers {
                 DBConst.strMstDataType[DBConst.eMSTDATATYPE.REF],
                 DBConst.eEyeType.LEFT,
                 conditions.ExamDateTime,
-                conditions.IsLManualInput,
+                deviceId,
                 sqlConnection);
             // EXAM_Refに保存(左眼測定値)
             var rec_Ref_l = MakeRefRec(exam_id_l,
                 DBConst.strEyeType[DBConst.eEyeType.LEFT],
                 setting.DisplaySetting.RefSelectType,
+                deviceId,
                 sqlConnection);
             rec_Ref_l.s_d[selectId] = conditions.LS_d;
             rec_Ref_l.c_d[selectId] = conditions.LC_d;
@@ -90,14 +93,14 @@ namespace AxialManagerS_Converter.Controllers {
       return;
     }
 
-    public static ExamRefRec MakeRefRec(int examId, string posEye, SelectType selectType, NpgsqlConnection sqlConnection) {
+    public static ExamRefRec MakeRefRec(int examId, string posEye, SelectType selectType, int deviceId, NpgsqlConnection sqlConnection) {
 
       var recRef = new ExamRefRec();
       try {
         recRef.exam_id = examId;
         recRef.examtype_id = Select_Examtype_ID(sqlConnection, DBConst.strMstDataType[DBConst.eMSTDATATYPE.REF]);
         recRef.eye_id = Select_Eye_ID(sqlConnection, posEye);
-        recRef.device_id = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
+        recRef.device_id = deviceId;
 
         recRef.is_exam_data = false;
         recRef.comment = ""; // タグが無いので空文字
