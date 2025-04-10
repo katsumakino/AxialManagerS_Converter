@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using AxialManagerS_Converter.Common;
@@ -130,6 +132,17 @@ namespace AxialManagerS_Converter.Components.ViewModel {
       } catch {
       } finally { }
 
+    }
+
+    public void GetConvertPatientCount() {
+      _model.GetConvertPatientCount(_srcFolder);
+    }
+
+    public int GetConvertProgress() {
+      if(_model.patientCount == 0) {
+        return 100;
+      }
+      return _model.progressValue * 100 / _model.patientCount;
     }
 
     #endregion

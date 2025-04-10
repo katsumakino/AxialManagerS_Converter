@@ -73,6 +73,7 @@ namespace AxialManagerS_Converter.Controllers {
         } finally {
           if (!result) {
             // todo: Error通知
+            int aaa = 0;
           }
 
           // PostgreSQL Server 通信切断
