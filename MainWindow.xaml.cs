@@ -13,6 +13,7 @@ namespace AxialManagerS_Converter {
     }
 
     private void FinishButton_Click(object sender, RoutedEventArgs e) {
+      Converter.DeleteFolder();
       Close();
     }
   }

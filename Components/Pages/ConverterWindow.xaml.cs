@@ -1,18 +1,5 @@
 ﻿using AxialManagerS_Converter.Common;
-using MS.WindowsAPICodePack.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace AxialManagerS_Converter.Components.Pages {
   /// <summary>
@@ -26,17 +13,22 @@ namespace AxialManagerS_Converter.Components.Pages {
     private void SelectButton_Click(object sender, RoutedEventArgs e) {
       FIleUtilities utilities = new();
       string path = string.Empty;
-      string fileName = string.Empty;
-      string filter = "JSONファイル(*.json)|*.json|すべてのファイル(*.*)|*.*";
+      string folderName = string.Empty;
+      string msg = "Select Folder";
 
       try {
-        if (!utilities.SelectFile(ref fileName, path, "", filter, "")) {
+        if (!utilities.SelectFolder(ref folderName, msg, path, "\\")) {
           return;
         }
 
-        if (!string.IsNullOrEmpty(fileName)) {
-          System.Windows.MessageBox.Show($"{fileName}", "fileName", MessageBoxButton.OK, MessageBoxImage.Information);
+        if (!string.IsNullOrEmpty(folderName)) {
+          System.Windows.MessageBox.Show($"{folderName}", "folder Path", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
+        if (DataContext is ViewModel.ConverterWindowVM vm) {
+          vm.SrcFolder = folderName;
+        }
+
       } catch {
       } finally { }
     }
@@ -49,12 +41,12 @@ namespace AxialManagerS_Converter.Components.Pages {
 
       try {
 
-        if(!utilities.SelectFolder(ref folderName, msg, path, "\\")) {
+        if (!utilities.SelectFolder(ref folderName, msg, path, "\\")) {
           return;
         }
 
         // todo: 設定ファイル、コメントファイル、データベースを指定のフォルダにコピーする
-        if(!utilities.CopyFolder(ConverterGlobal.Axm1DBFolderPath, folderName, false)) {
+        if (!utilities.CopyFolder(ConverterGlobal.Axm1DBFolderPath, folderName, false)) {
           return;
         }
 
@@ -66,9 +58,7 @@ namespace AxialManagerS_Converter.Components.Pages {
           return;
         }
 
-        if (DataContext is ViewModel.ConverterWindowVM vm) {
-          vm.SrcFolder = folderName;
-        }
+        CopyCheckLabel.Visibility = Visibility.Visible;
 
         System.Windows.MessageBox.Show("Complete", "", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -79,8 +69,23 @@ namespace AxialManagerS_Converter.Components.Pages {
 
     private void SettingConvertButton_Click(object sender, RoutedEventArgs e) {
 
-      if(DataContext is ViewModel.ConverterWindowVM vm) {
+      if (DataContext is ViewModel.ConverterWindowVM vm) {
         vm.DoConvert();
+      }
+    }
+
+    public void DeleteFolder() {
+
+      if (!string.IsNullOrEmpty(vm.SrcFolder)) {
+        FIleUtilities utilities = new();
+        var result = System.Windows.MessageBox.Show("変換元のコピーデータを削除しますか？", "削除確認", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+        if (result == MessageBoxResult.Yes) {
+          if (DataContext is ViewModel.ConverterWindowVM vm) {
+            // 変換元のコピーデータを削除
+            utilities.ForceRemoveDir(vm.SrcFolder);
+          }
+        }
       }
     }
   }

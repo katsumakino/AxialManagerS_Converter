@@ -12,10 +12,19 @@
 	</UserControl.DataContext>
 	<Grid>
 		<StackPanel Orientation="Vertical">
-			<Button x:Name="CopyButton" Content="Copy"
-					Style="{StaticResource Standard_Button}"
-					Width="100" Height="50" HorizontalAlignment="Left"
-					Click="CopyButton_Click"/>
+			<StackPanel Orientation="Horizontal">
+				<Button x:Name="CopyButton" Content="Copy"
+						Style="{StaticResource Standard_Button}"
+						Width="100" Height="50" HorizontalAlignment="Left"
+						Click="CopyButton_Click"/>
+				<Label x:Name="CopyCheckLabel"
+					   Content="OK"
+					   Style="{StaticResource Standard_Label}"
+					   Width="200" Height="50" HorizontalAlignment="Left"
+					   VerticalAlignment="Center" Margin="10,0,0,0"
+					   Visibility="Hidden"/>
+			</StackPanel>
+			
 			<TextBox Text="{Binding Path=SrcFolder}"
 					 Style="{StaticResource Display_TextBox}"
 					 Width="400" Height="50" HorizontalAlignment="Left"
@@ -24,15 +33,6 @@
 					Style="{StaticResource Standard_Button}"
 					Width="100" Height="50" HorizontalAlignment="Left"
 					Click="SelectButton_Click"/>
-			<StackPanel Orientation="Horizontal">
-				<RadioButton x:Name="FullConvertButton" Content="FULL"
-						Style="{StaticResource Toggle_RadioButton}"
-						Width="100" Height="50" HorizontalAlignment="Left"/>
-				<RadioButton x:Name="SetupConvertButton" Content="SET UP"
-					Style="{StaticResource Toggle_RadioButton}"
-					Width="100" Height="50" HorizontalAlignment="Left"
-					IsChecked="True"/>
-			</StackPanel>
 			<Button x:Name="SettingConvertButton" Content="Convert"
 					Style="{StaticResource Standard_Button}"
 					Width="100" Height="50" HorizontalAlignment="Left"
