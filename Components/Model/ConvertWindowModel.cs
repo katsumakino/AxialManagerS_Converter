@@ -25,6 +25,8 @@ namespace AxialManagerS_Converter.Components.Model {
     public int patientCount = 0;
     public int progressValue = 0;
 
+    public int execErrorCount = 0; // エラー件数
+
     // todo: 設定ファイルのパスを確認(wwwroot?)
     private string settingDirTopPath = @"C:/TomeyApp/AxialManager2/Setting/";
     private readonly string settingFileName = "GeneralSetting.json";
@@ -310,10 +312,8 @@ namespace AxialManagerS_Converter.Components.Model {
 
       try {
         string sql = "SELECT * FROM " + Axm1PatientClass.Axm1DB_TableNames[(int)Axm1PatientClass.eAxm1DbTable.patientInfoTable];
-        //sql += " WHERE ID = '123456789'"; // todo: test確認用
-        if(setAgeRange) {
-          //sql += "WHERE Birth BETWEEN";
-          sql += " AND Birth BETWEEN";
+        if (setAgeRange) {
+          sql += "WHERE Birth BETWEEN";
           sql += (" '" + birthMax.ToString("yyyy/MM/dd") + "' AND '" + birthMin.ToString("yyyy/MM/dd") + "'");
         }
         using (var command = new SQLiteCommand(sql, connection)) {
@@ -342,8 +342,6 @@ namespace AxialManagerS_Converter.Components.Model {
               } else {
                 patientInfo.Gender = Gender.none;
               }
-
-              // todo: SD Converterを見て、高速化手法確認
 
               // DBに書込
               dbPatientInfo.SetPatientInfo(patientInfo);

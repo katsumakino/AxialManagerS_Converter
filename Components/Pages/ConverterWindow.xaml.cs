@@ -45,7 +45,7 @@ namespace AxialManagerS_Converter.Components.Pages {
           return;
         }
 
-        // todo: 設定ファイル、コメントファイル、データベースを指定のフォルダにコピーする
+        // 設定ファイル、コメントファイル、データベースを指定のフォルダにコピーする
         if (!utilities.CopyFolder(ConverterGlobal.Axm1DBFolderPath, folderName, false)) {
           return;
         }

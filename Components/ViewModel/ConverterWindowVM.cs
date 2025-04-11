@@ -126,7 +126,7 @@ namespace AxialManagerS_Converter.Components.ViewModel {
         // todo: 合否確認
 
         // コメントファイルを読み込み→変換
-        //_model.ConvertCommentFile(_srcFolder);
+        _model.ConvertCommentFile(_srcFolder);
         // todo: 合否確認
 
       } catch {

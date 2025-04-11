@@ -54,7 +54,11 @@ namespace AxialManagerS_Converter.Controllers {
         } finally {
           if (!result) {
             // todo: Error通知
-            int aaa = 0;
+            string filePath = "C:\\TomeyApp\\AxialManager2\\output.txt";
+            string content = "TREATMENTINFO:" + conditions.TreatName;
+
+            // ファイルの末尾に書き込む
+            System.IO.File.AppendAllText(filePath, content + Environment.NewLine);
           }
 
           // PostgreSQL Server 通信切断
@@ -123,7 +127,11 @@ namespace AxialManagerS_Converter.Controllers {
 
           if (!result) {
             // todo: Error通知
-            int aaa = 0;
+            string filePath = "C:\\TomeyApp\\AxialManager2\\output.txt";
+            string content = "TREATMENT:" + conditions.PatientID;
+
+            // ファイルの末尾に書き込む
+            System.IO.File.AppendAllText(filePath, content + Environment.NewLine);
           }
 
           // PostgreSQL Server 通信切断

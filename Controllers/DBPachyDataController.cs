@@ -14,7 +14,7 @@ namespace AxialManagerS_Converter.Controllers {
         if (conditions == null) return;
         if (conditions.PatientID == null || conditions.PatientID == string.Empty) return;
 
-        bool result = false;
+        bool result = true;
         DBAccess dbAccess = DBAccess.GetInstance();
 
         try {
@@ -48,7 +48,9 @@ namespace AxialManagerS_Converter.Controllers {
             rec_Pachy_r.measured_at = conditions.ExamDateTime;
 
             // DB登録
-            result = Insert(rec_Pachy_r, sqlConnection);
+            if(rec_Pachy_r.is_exam_data == true) {
+              result = Insert(rec_Pachy_r, sqlConnection);
+            }           
 
             // EXAM_LISTに保存(左眼測定値)
             var exam_id_l = RegisterExamList(uuid,
@@ -67,13 +69,19 @@ namespace AxialManagerS_Converter.Controllers {
             rec_Pachy_l.measured_at = conditions.ExamDateTime;
 
             // DB登録
-            result &= Insert(rec_Pachy_l, sqlConnection);
+            if(rec_Pachy_l.is_exam_data == true) {
+              result &= Insert(rec_Pachy_l, sqlConnection);
+            }
           }
         } catch {
         } finally {
           if (!result) {
             // todo: Error通知
-            int aaa = 0;
+            string filePath = "C:\\TomeyApp\\AxialManager2\\output.txt";
+            string content = "PACHY:" + conditions.PatientID;
+
+            // ファイルの末尾に書き込む
+            System.IO.File.AppendAllText(filePath, content + Environment.NewLine);
           }
 
           // PostgreSQL Server 通信切断
