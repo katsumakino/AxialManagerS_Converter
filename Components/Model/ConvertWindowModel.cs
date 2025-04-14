@@ -802,7 +802,6 @@ namespace AxialManagerS_Converter.Components.Model {
 
       try {
         string sql = "SELECT * FROM " + Axm1PatientClass.Axm1DB_TableNames[(int)table];
-        sql += " WHERE MEDICAL = 'Atropine'"; // todo: test確認用
         using (var command = new SQLiteCommand(sql, connection)) {
           using (var reader = command.ExecuteReader()) {
             while (reader.Read()) {
