@@ -10,13 +10,14 @@ namespace AxialManagerS_Converter.Controllers {
   public class DBAxmCommentController {
 
     // コメント登録
-    public void SetAxmComment(AxmCommentRequest conditions) {
-      try {
-        if (conditions == null) return;
-        if (conditions.PatientID == null || conditions.PatientID == string.Empty) return;
-        if (conditions.AxmComment.Description == null) return;
+    public int SetAxmComment(AxmCommentRequest conditions) {
+      bool result = false;
 
-        bool result = false;
+      try {
+        if (conditions == null) return 1;
+        if (conditions.PatientID == null || conditions.PatientID == string.Empty) return 1;
+        if (conditions.AxmComment.Description == null) return 1;
+
         DBAccess dbAccess = DBAccess.GetInstance();
 
         try {
@@ -29,7 +30,7 @@ namespace AxialManagerS_Converter.Controllers {
           var uuid = Select_PTUUID_by_PTID(sqlConnection, conditions.PatientID);
           if (uuid == string.Empty) {
             // コメント登録時は、必ず患者データが存在する
-            return;
+            return 1;
           }
 
           // コメントデータID取得
@@ -66,7 +67,7 @@ namespace AxialManagerS_Converter.Controllers {
       } catch {
       }
 
-      return;
+      return (result)? 0 : 1;
     }
 
     public static bool InsertAxmComment(AxmCommentRec rec, NpgsqlConnection sqlConnection) {

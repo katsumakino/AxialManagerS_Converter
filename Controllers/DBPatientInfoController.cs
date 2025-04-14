@@ -12,12 +12,13 @@ namespace AxialManagerS_Converter.Controllers {
   public class DBPatientInfoController {
 
     // 患者情報書込み
-    public void SetPatientInfo(PatientInfo conditions) {
-      try {
-        if (conditions == null) return;
-        if (conditions.ID == null || conditions.ID == string.Empty) return;
+    public int SetPatientInfo(PatientInfo conditions) {
+      bool result = false;
 
-        bool result = false;
+      try {
+        if (conditions == null) return 1;
+        if (conditions.ID == null || conditions.ID == string.Empty) return 1;
+
         DBAccess dbAccess = DBAccess.GetInstance();
 
         try {
@@ -110,7 +111,7 @@ namespace AxialManagerS_Converter.Controllers {
       } catch {
       }
 
-      return;
+      return (result)? 0 : 1;
     }
 
     // 主キー重複時Update

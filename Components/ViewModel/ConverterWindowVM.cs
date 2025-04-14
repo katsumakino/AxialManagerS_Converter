@@ -102,6 +102,16 @@ namespace AxialManagerS_Converter.Components.ViewModel {
       }
     }
 
+    public int ExecErrorCount {
+      get { return _model.execErrorCount; }
+      set {
+        if (_model.execErrorCount != value) {
+          _model.execErrorCount = value;
+          RaisePropertyChanged(nameof(ExecErrorCount));
+        }
+      }
+    }
+
     #endregion
 
     #region ■コンストラクタ
@@ -116,19 +126,17 @@ namespace AxialManagerS_Converter.Components.ViewModel {
 
     public void DoConvert() {
       try {
+        ExecErrorCount = 0;
+
         string settingFilePath = System.IO.Path.Combine(_srcFolder, ConverterGlobal.Axm1SettingFileName);
         // 設定ファイルを読み込み→変換
         _model.ConvertSettingFile(settingFilePath);
-        // todo: 合否確認
 
         // DBからデータを読み込み→変換
         _model.ConvertDB(_srcFolder);
-        // todo: 合否確認
 
         // コメントファイルを読み込み→変換
         _model.ConvertCommentFile(_srcFolder);
-        // todo: 合否確認
-
       } catch {
       } finally { }
 

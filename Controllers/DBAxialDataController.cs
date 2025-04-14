@@ -10,13 +10,14 @@ namespace AxialManagerS_Converter.Controllers {
   public class DBAxialDataController {
 
     // 眼軸長測定値書込み
-    public void SetOptAxial(AxialList conditions, GeneralSetting? setting) {
-      try {
-        if (conditions == null) return;
-        if (conditions.PatientID == null || conditions.PatientID == string.Empty) return;
-        if (setting == null) return;
+    public int SetOptAxial(AxialList conditions, GeneralSetting? setting) {
+      bool result = true;
 
-        bool result = true;
+      try {
+        if (conditions == null) return 1;
+        if (conditions.PatientID == null || conditions.PatientID == string.Empty) return 1;
+        if (setting == null) return 1;
+
         DBAccess dbAccess = DBAccess.GetInstance();
 
         try {
@@ -36,7 +37,7 @@ namespace AxialManagerS_Converter.Controllers {
           var uuid = Select_PTUUID_by_PTID(sqlConnection, conditions.PatientID);
           if (uuid == string.Empty) {
             // AXMからの測定データ登録時は、必ず患者データが存在する
-            return;
+            return 1;
           } else {
             // EXAM_LISTに保存(右眼測定値)
             var exam_id_r = RegisterExamList(uuid,
@@ -99,7 +100,7 @@ namespace AxialManagerS_Converter.Controllers {
       } catch {
       }
 
-      return;
+      return (result)? 0 : 1;
     }
 
     public static ExamOptaxialRec MakeOptaxialRec(int examId, string posEye, FittingsType fittingsType, int deviceId, NpgsqlConnection sqlConnection) {

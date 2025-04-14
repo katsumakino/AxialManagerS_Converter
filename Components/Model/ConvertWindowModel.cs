@@ -90,6 +90,8 @@ namespace AxialManagerS_Converter.Components.Model {
         File.WriteAllText(destPath, writeJson);
 
       } catch {
+        // エラー処理
+        execErrorCount++;
       } finally { }
 
       return true;
@@ -224,11 +226,11 @@ namespace AxialManagerS_Converter.Components.Model {
 
                   if (property.Name == "PatientData") {
                     // 被検者コメントをDBに書込
-                    dBAxmComment.SetAxmComment(request);
+                    execErrorCount += dBAxmComment.SetAxmComment(request);
                   } else {
                     if (values[1] != string.Empty) {
                       // 測定日コメントをDBに書込
-                      dBAxmComment.SetAxmComment(request);
+                      execErrorCount += dBAxmComment.SetAxmComment(request);
                     }
                   }
                 }
@@ -344,7 +346,7 @@ namespace AxialManagerS_Converter.Components.Model {
               }
 
               // DBに書込
-              dbPatientInfo.SetPatientInfo(patientInfo);
+              execErrorCount += dbPatientInfo.SetPatientInfo(patientInfo);
           
               ConvertAxialTable(connection, patientInfo.ID, yearMin, yearMax);
               ConvertRefTable(connection, patientInfo.ID, yearMin, yearMax, true);
@@ -433,7 +435,7 @@ namespace AxialManagerS_Converter.Components.Model {
               axialList.IsLManualInput = manual;
 
               // DBに書込
-              dBAxialData.SetOptAxial(axialList, axm2Setting);
+              execErrorCount += dBAxialData.SetOptAxial(axialList, axm2Setting);
             }
           }
         }
@@ -533,10 +535,10 @@ namespace AxialManagerS_Converter.Components.Model {
 
               if (table == Axm1PatientClass.eAxm1DbTable.refTable) {
                 // DBに書込(自覚値)
-                dBSciRefData.SetSciRef(refList);
+                execErrorCount += dBSciRefData.SetSciRef(refList);
               } else {
                 // DBに書込(他覚値)
-                dBRefData.SetRef(refList, axm2Setting);
+                execErrorCount += dBRefData.SetRef(refList, axm2Setting);
               }
             }
           }
@@ -693,7 +695,7 @@ namespace AxialManagerS_Converter.Components.Model {
               krtList.IsLManualInput = manual;
 
               // DBに書込
-              dBKrtData.SetKrt(krtList, axm2Setting);
+              execErrorCount += dBKrtData.SetKrt(krtList, axm2Setting);
             }
           }
         }
@@ -767,7 +769,7 @@ namespace AxialManagerS_Converter.Components.Model {
               pachyList.IsLManualInput = manual;
 
               // DBに書込
-              dBPachyData.SetPachy(pachyList);
+              execErrorCount += dBPachyData.SetPachy(pachyList);
             }
           }
         }
@@ -826,7 +828,7 @@ namespace AxialManagerS_Converter.Components.Model {
               treatmentList.ID = dBTreatment.GetTreatmentId(treatmentList.TreatName);
 
               // DBに書込
-              dBTreatment.SetTreatmentMethod(treatmentList);
+              execErrorCount += dBTreatment.SetTreatmentMethod(treatmentList);
 
               // 治療IDの対比表更新
               treatmentIdList.Add(new TreatmentIdTable() {
@@ -905,7 +907,7 @@ namespace AxialManagerS_Converter.Components.Model {
               treatmentDataRequest.TreatmentData = treatmentList;
 
               // DBに書込
-              dBTreatment.SetTreatment(treatmentDataRequest);
+              execErrorCount += dBTreatment.SetTreatment(treatmentDataRequest);
             }
           }
         }

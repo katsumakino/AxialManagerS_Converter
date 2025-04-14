@@ -96,7 +96,7 @@ namespace AxialManagerS_Converter.Components.Pages {
       // ストップウォッチを停止
       stopwatch.Stop();
 
-      System.Windows.MessageBox.Show($"処理時間: {stopwatch.ElapsedMilliseconds}ミリ秒", "Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+      System.Windows.MessageBox.Show($"処理時間: {stopwatch.ElapsedMilliseconds}ミリ秒 \n変換失敗件数： {vm.ExecErrorCount}件", "Complete", MessageBoxButton.OK, MessageBoxImage.Information);
 
       // 処理が完了したら、ウィンドウを閉じる
       if (processingWindow.IsVisible) {

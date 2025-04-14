@@ -11,14 +11,15 @@ namespace AxialManagerS_Converter.Controllers {
   public class DBTreatmentController {
 
     // 治療方法設定登録
-    public void SetTreatmentMethod(TreatmentMethodSetting conditions) {
+    public int SetTreatmentMethod(TreatmentMethodSetting conditions) {
+      bool result = false;
+
       try {
-        if (conditions == null) return;
+        if (conditions == null) return 1;
 
-        if (conditions.TreatName == null || conditions.TreatName == string.Empty) return;
-        if (conditions.RGBAColor == null) return;
+        if (conditions.TreatName == null || conditions.TreatName == string.Empty) return 1;
+        if (conditions.RGBAColor == null) return 1;
 
-        bool result = false;
         DBAccess dbAccess = DBAccess.GetInstance();
 
         try {
@@ -67,18 +68,18 @@ namespace AxialManagerS_Converter.Controllers {
       } catch {
       }
 
-      return;
+      return (result)? 0 : 1;
     }
 
     // 治療状況登録
-    public void SetTreatment(TreatmentDataRequest conditions) {
+    public int SetTreatment(TreatmentDataRequest conditions) {
+      bool result = false;
+
       try {
-        if (conditions == null) return;
-        if (conditions.PatientID == null || conditions.PatientID == string.Empty) return;
+        if (conditions == null) return 1;
+        if (conditions.PatientID == null || conditions.PatientID == string.Empty) return 1;
+        if (conditions.TreatmentData == null) return 1;
 
-        if (conditions.TreatmentData == null) return;
-
-        bool result = false;
         DBAccess dbAccess = DBAccess.GetInstance();
 
         try {
@@ -91,14 +92,14 @@ namespace AxialManagerS_Converter.Controllers {
           var type_id = Select_TreatmentTypeId_By_TreatmentInfo(sqlConnection, conditions.TreatmentData.TreatID);
           // 治療方法IDが登録されていない場合は、エラーとして処理を終了する
           if (type_id == -1) {
-            return;
+            return 1;
           }
 
           // 患者UUID取得
           var uuid = Select_PTUUID_by_PTID(sqlConnection, conditions.PatientID);
           if (uuid == string.Empty) {
             // 治療状況登録時は、必ず患者データが存在する
-            return;
+            return 1;
           }
 
           // IDが登録済みであるか確認
@@ -140,7 +141,7 @@ namespace AxialManagerS_Converter.Controllers {
       } catch {
       }
 
-      return;
+      return (result)? 0 : 1;
     }
 
     /// <summary>
