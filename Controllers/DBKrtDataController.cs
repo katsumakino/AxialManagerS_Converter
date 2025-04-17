@@ -23,7 +23,9 @@ namespace AxialManagerS_Converter.Controllers {
           // PostgreSQL Server 通信接続
           NpgsqlConnection sqlConnection = dbAccess.GetSqlConnection();
 
-          int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)setting.DisplaySetting.KrtSelectType]) - 1;
+          //int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)setting.DisplaySetting.KrtSelectType]) - 1;
+          int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)SelectType.Average]) - 1;
+          int selectTypId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)SelectType.Median]) - 1;
           int deviceId = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
 
           // クエリコマンド実行
@@ -53,8 +55,22 @@ namespace AxialManagerS_Converter.Controllers {
             rec_krt_r.avek_mm[selectId] = (conditions.RK1_mm + conditions.RK2_mm) / 2;
             rec_krt_r.avek_d[selectId] = (conditions.RK1_d + conditions.RK2_d) / 2;
             rec_krt_r.cyl_d[selectId] = conditions.RCyl_d;
-            rec_krt_r.is_exam_data = conditions.RK1_mm != null && conditions.RK2_mm != null && conditions.RCyl_d != null
+
+            rec_krt_r.k1_mm[selectTypId] = conditions.RK1_Typ_mm;
+            rec_krt_r.k1_d[selectTypId] = conditions.RK1_Typ_d;
+            rec_krt_r.k2_mm[selectTypId] = conditions.RK2_Typ_mm;
+            rec_krt_r.k2_d[selectTypId] = conditions.RK2_Typ_d;
+            rec_krt_r.avek_mm[selectTypId] = (conditions.RK1_Typ_mm + conditions.RK2_Typ_mm) / 2;
+            rec_krt_r.avek_d[selectTypId] = (conditions.RK1_Typ_d + conditions.RK2_Typ_d) / 2;
+            rec_krt_r.cyl_d[selectTypId] = conditions.RCyl_Typ_d;
+
+            if(setting.DisplaySetting.KrtSelectType == SelectType.Average) {
+              rec_krt_r.is_exam_data = conditions.RK1_mm != null && conditions.RK2_mm != null && conditions.RCyl_d != null
               || conditions.RK1_d != null && conditions.RK2_d != null && conditions.RCyl_d != null;
+            } else if (setting.DisplaySetting.KrtSelectType == SelectType.Median) {
+              rec_krt_r.is_exam_data = conditions.RK1_Typ_mm != null && conditions.RK2_Typ_mm != null && conditions.RCyl_Typ_d != null
+              || conditions.RK1_Typ_d != null && conditions.RK2_Typ_d != null && conditions.RCyl_Typ_d != null;
+            }
             rec_krt_r.measured_at = conditions.ExamDateTime;
 
             // DB登録
@@ -82,8 +98,23 @@ namespace AxialManagerS_Converter.Controllers {
             rec_krt_l.avek_mm[selectId] = (conditions.LK1_mm + conditions.LK2_mm) / 2;
             rec_krt_l.avek_d[selectId] = (conditions.LK1_d + conditions.LK2_d) / 2;
             rec_krt_l.cyl_d[selectId] = conditions.LCyl_d;
-            rec_krt_l.is_exam_data = conditions.LK1_mm != null && conditions.LK2_mm != null && conditions.LCyl_d != null
+
+            rec_krt_l.k1_mm[selectTypId] = conditions.LK1_Typ_mm;
+            rec_krt_l.k1_d[selectTypId] = conditions.LK1_Typ_d;
+            rec_krt_l.k2_mm[selectTypId] = conditions.LK2_Typ_mm;
+            rec_krt_l.k2_d[selectTypId] = conditions.LK2_Typ_d;
+            rec_krt_l.avek_mm[selectTypId] = (conditions.LK1_Typ_mm + conditions.LK2_Typ_mm) / 2;
+            rec_krt_l.avek_d[selectTypId] = (conditions.LK1_Typ_d + conditions.LK2_Typ_d) / 2;
+            rec_krt_l.cyl_d[selectTypId] = conditions.LCyl_Typ_d;
+
+            if (setting.DisplaySetting.KrtSelectType == SelectType.Average) {
+              rec_krt_l.is_exam_data = conditions.LK1_mm != null && conditions.LK2_mm != null && conditions.LCyl_d != null
               || conditions.LK1_d != null && conditions.LK2_d != null && conditions.LCyl_d != null;
+            } else if (setting.DisplaySetting.KrtSelectType == SelectType.Median) {
+              rec_krt_l.is_exam_data = conditions.LK1_Typ_mm != null && conditions.LK2_Typ_mm != null && conditions.LCyl_Typ_d != null
+              || conditions.LK1_Typ_d != null && conditions.LK2_Typ_d != null && conditions.LCyl_Typ_d != null;
+            }
+
             rec_krt_l.measured_at = conditions.ExamDateTime;
 
             // DB登録

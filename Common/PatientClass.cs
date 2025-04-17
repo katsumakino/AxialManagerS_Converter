@@ -93,6 +93,20 @@
     public double? LAveK_mm { get; set; }                //左平均角膜曲率半径[mm]
     public double? LAveK_d { get; set; }                 //左平均角膜曲率屈折力[D]
     public double? LCyl_d { get; set; }                  //左乱視度数[D]
+    public double? RK1_Typ_mm { get; set; }                  //右角膜曲率半径(弱主経線)[mm]
+    public double? RK1_Typ_d { get; set; }                   //右角膜曲率屈折力(弱主経線)[D]
+    public double? RK2_Typ_mm { get; set; }                  //右角膜曲率平均(強主経線)[mm]
+    public double? RK2_Typ_d { get; set; }                   //右角膜曲率屈折力(強主経線)[D]
+    public double? RAveK_Typ_mm { get; set; }                //右平均角膜曲率半径[mm]
+    public double? RAveK_Typ_d { get; set; }                 //右平均角膜曲率屈折力[D]
+    public double? RCyl_Typ_d { get; set; }                  //右乱視度数[D]
+    public double? LK1_Typ_mm { get; set; }                  //左角膜曲率半径(弱主経線)[mm]
+    public double? LK1_Typ_d { get; set; }                   //左角膜曲率屈折力(弱主経線)[D]
+    public double? LK2_Typ_mm { get; set; }                  //左角膜曲率平均(強主経線)[mm]
+    public double? LK2_Typ_d { get; set; }                   //左角膜曲率屈折力(強主経線)[D]
+    public double? LAveK_Typ_mm { get; set; }                //左平均角膜曲率半径[mm]
+    public double? LAveK_Typ_d { get; set; }                 //左平均角膜曲率屈折力[D]
+    public double? LCyl_Typ_d { get; set; }                  //左乱視度数[D]
     public DateTime? ExamDateTime { get; set; }         //測定日時
     public bool IsRManualInput { get; set; }            //右眼手入力フラグ
     public bool IsLManualInput { get; set; }            //左眼手入力フラグ
@@ -108,6 +122,13 @@
     public List<double?> AveK_mm { get; set; } = new List<double?>();//平均角膜曲率半径[mm]
     public List<double?> AveK_d { get; set; } = new List<double?>(); //平均角膜曲率屈折力[D]
     public List<double?> Cyl_d { get; set; } = new List<double?>();  //乱視度数[D]
+    public List<double?> K1_Typ_mm { get; set; } = new List<double?>();  //角膜曲率半径(弱主経線)[mm]
+    public List<double?> K1_Typ_d { get; set; } = new List<double?>();   //角膜曲率屈折力(弱主経線)[D]
+    public List<double?> K2_Typ_mm { get; set; } = new List<double?>();  //角膜曲率平均(強主経線)[mm]
+    public List<double?> K2_Typ_d { get; set; } = new List<double?>();   //角膜曲率屈折力(強主経線)[D]
+    public List<double?> AveK_Typ_mm { get; set; } = new List<double?>();//平均角膜曲率半径[mm]
+    public List<double?> AveK_Typ_d { get; set; } = new List<double?>(); //平均角膜曲率屈折力[D]
+    public List<double?> Cyl_Typ_d { get; set; } = new List<double?>();  //乱視度数[D]
     public EyeType EyeId { get; set; }          //左右眼情報
     public int? DeviceID { get; set; }           //測定装置ID
     public bool? IsExamData { get; set; }        //測定データ有無
@@ -127,6 +148,14 @@
     public double? LC_d { get; set; }                    //左乱視度数[D]
     public int? LA_deg { get; set; }                     //左乱視軸[°]
     public double? LSE_d { get; set; }                   //左等価球面度数[D]
+    public double? RS_Typ_d { get; set; }                    //右球面度数[D]
+    public double? RC_Typ_d { get; set; }                    //右乱視度数[D]
+    public int? RA_Typ_deg { get; set; }                     //右乱視軸[°]
+    public double? RSE_Typ_d { get; set; }                   //右等価球面度数[D]
+    public double? LS_Typ_d { get; set; }                    //左球面度数[D]
+    public double? LC_Typ_d { get; set; }                    //左乱視度数[D]
+    public int? LA_Typ_deg { get; set; }                     //左乱視軸[°]
+    public double? LSE_Typ_d { get; set; }                   //左等価球面度数[D]
     public DateTime? ExamDateTime { get; set; }         //測定日
     public bool IsRManualInput { get; set; }            //右眼手入力フラグ
     public bool IsLManualInput { get; set; }            //左眼手入力フラグ

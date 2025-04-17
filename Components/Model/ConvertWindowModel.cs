@@ -27,8 +27,8 @@ namespace AxialManagerS_Converter.Components.Model {
 
     public int execErrorCount = 0; // エラー件数
 
-    // todo: 設定ファイルのパスを確認(wwwroot?)
-    private string settingDirTopPath = @"C:/TomeyApp/AxialManager2/Setting/";
+    // 設定ファイルのパス
+    private string settingDirTopPath = @"C:/TomeyApp/AxialManager2/AxialManagerS/wwwroot/settings/";
     private readonly string settingFileName = "GeneralSetting.json";
     private GeneralSetting? axm2Setting = new();
 
@@ -272,7 +272,7 @@ namespace AxialManagerS_Converter.Components.Model {
           connection.Open();
 
           string sql = "SELECT COUNT(*) FROM " + Axm1PatientClass.Axm1DB_TableNames[(int)Axm1PatientClass.eAxm1DbTable.patientInfoTable];
-          if(setAgeRange) {
+          if (setAgeRange) {
             DateOnly birthMin = DBCommonController.CalculateBirthDateFromAge(ageMin);
             DateOnly birthMax = DBCommonController.CalculateBirthDateFromAge(ageMax, true);
             sql += " WHERE Birth BETWEEN";
@@ -347,7 +347,7 @@ namespace AxialManagerS_Converter.Components.Model {
 
               // DBに書込
               execErrorCount += dbPatientInfo.SetPatientInfo(patientInfo);
-          
+
               ConvertAxialTable(connection, patientInfo.ID, yearMin, yearMax);
               ConvertRefTable(connection, patientInfo.ID, yearMin, yearMax, true);
               ConvertRefTable(connection, patientInfo.ID, yearMin, yearMax, false);
@@ -458,18 +458,11 @@ namespace AxialManagerS_Converter.Components.Model {
         return false;
       }
 
-      Axm1PatientClass.eAxm1DbTable table;
+      Axm1PatientClass.eAxm1DbTable table = Axm1PatientClass.eAxm1DbTable.none;
+      Axm1PatientClass.eAxm1DbTable tableTyp = Axm1PatientClass.eAxm1DbTable.none;
       if (isObj) {
-        switch (axm2Setting.DisplaySetting.RefSelectType) {
-          case SelectType.Average:
-            table = Axm1PatientClass.eAxm1DbTable.refObjTable;
-            break;
-          case SelectType.Median:
-            table = Axm1PatientClass.eAxm1DbTable.refObjTypTable;
-            break;
-          default:
-            return false;
-        }
+        table = Axm1PatientClass.eAxm1DbTable.refObjTable;
+        tableTyp = Axm1PatientClass.eAxm1DbTable.refObjTypTable;
       } else {
         table = Axm1PatientClass.eAxm1DbTable.refTable;
       }
@@ -493,6 +486,13 @@ namespace AxialManagerS_Converter.Components.Model {
           sql += " AND ST_DT BETWEEN";
           sql += (" '" + max + "' AND '" + min + "'");
         }
+
+        string sqlTyp = string.Empty;
+        if (isObj) {
+          sqlTyp = "SELECT * FROM " + Axm1PatientClass.Axm1DB_TableNames[(int)tableTyp];
+          sqlTyp += (" WHERE ID = '" + pt_id + "' AND ST_DT = ");
+        }
+
         using (var command = new SQLiteCommand(sql, connection)) {
           using (var reader = command.ExecuteReader()) {
             while (reader.Read()) {
@@ -533,6 +533,33 @@ namespace AxialManagerS_Converter.Components.Model {
               refList.IsRManualInput = manual;
               refList.IsLManualInput = manual;
 
+              if (isObj) {
+                using (var commandTyp = new SQLiteCommand(sqlTyp + ("'" + st_dt + "'"), connection)) {
+                  using (var readerTyp = commandTyp.ExecuteReader()) {
+                    while (readerTyp.Read()) {
+                      sR = readerTyp[Axm1PatientClass.COLNAME_Axm1RefList
+                        [(int)Axm1PatientClass.eAxm1RefTable.sphOd]].ToString();
+                      refList.RS_Typ_d = (double.TryParse(sR, out double dSR_Typ)) ? dSR_Typ : null;
+                      cR = readerTyp[Axm1PatientClass.COLNAME_Axm1RefList
+                        [(int)Axm1PatientClass.eAxm1RefTable.cylOd]].ToString();
+                      refList.RC_Typ_d = (double.TryParse(cR, out double dCR_Typ)) ? dCR_Typ : null;
+                      aR = readerTyp[Axm1PatientClass.COLNAME_Axm1RefList
+                        [(int)Axm1PatientClass.eAxm1RefTable.axisOd]].ToString();
+                      refList.RA_Typ_deg = (int.TryParse(aR, out int iAR_Typ)) ? iAR_Typ : null;
+                      sL = readerTyp[Axm1PatientClass.COLNAME_Axm1RefList
+                         [(int)Axm1PatientClass.eAxm1RefTable.sphOs]].ToString();
+                      refList.LS_Typ_d = (double.TryParse(sL, out double dSL_Typ)) ? dSL_Typ : null;
+                      cL = readerTyp[Axm1PatientClass.COLNAME_Axm1RefList
+                        [(int)Axm1PatientClass.eAxm1RefTable.cylOs]].ToString();
+                      refList.LC_Typ_d = (double.TryParse(cL, out double dCL_Typ)) ? dCL_Typ : null;
+                      aL = readerTyp[Axm1PatientClass.COLNAME_Axm1RefList
+                        [(int)Axm1PatientClass.eAxm1RefTable.axisOs]].ToString();
+                      refList.LA_Typ_deg = (int.TryParse(aL, out int iAL_Typ)) ? iAL_Typ : null;
+                    }
+                  }
+                }
+              }
+
               if (table == Axm1PatientClass.eAxm1DbTable.refTable) {
                 // DBに書込(自覚値)
                 execErrorCount += dBSciRefData.SetSciRef(refList);
@@ -563,75 +590,40 @@ namespace AxialManagerS_Converter.Components.Model {
       }
 
       Axm1PatientClass.eAxm1DbTable table;
+      Axm1PatientClass.eAxm1DbTable tableTyp;
 
-      switch (axm2Setting.DisplaySetting.KrtSelectType) {
-        case SelectType.Average:
-          switch (axm2Setting.DisplaySetting.KrtDeviceType) {
-            case KrtDeviceType.OA2000:
-              switch (axm2Setting.DisplaySetting.KrtPhiType) {
-                case PhiType.Phi2_0:
-                  table = Axm1PatientClass.eAxm1DbTable.keratoOA20Table;
-                  break;
-                case PhiType.Phi2_5:
-                  table = Axm1PatientClass.eAxm1DbTable.keratoOA25Table;
-                  break;
-                case PhiType.Phi3_0:
-                  table = Axm1PatientClass.eAxm1DbTable.keratoOATable;
-                  break;
-                default:
-                  return false;
-              }
+      switch (axm2Setting.DisplaySetting.KrtDeviceType) {
+        case KrtDeviceType.OA2000:
+          switch (axm2Setting.DisplaySetting.KrtPhiType) {
+            case PhiType.Phi2_0:
+              table = Axm1PatientClass.eAxm1DbTable.keratoOA20Table;
+              tableTyp = Axm1PatientClass.eAxm1DbTable.keratoOA20TypTable;
               break;
-            case KrtDeviceType.MR:
-              switch (axm2Setting.DisplaySetting.KrtPhiType) {
-                case PhiType.Phi2_0:
-                  table = Axm1PatientClass.eAxm1DbTable.kerato20Table;
-                  break;
-                case PhiType.Phi2_5:
-                  table = Axm1PatientClass.eAxm1DbTable.kerato25Table;
-                  break;
-                case PhiType.Phi3_0:
-                  table = Axm1PatientClass.eAxm1DbTable.keratoTable;
-                  break;
-                default:
-                  return false;
-              }
+            case PhiType.Phi2_5:
+              table = Axm1PatientClass.eAxm1DbTable.keratoOA25Table;
+              tableTyp = Axm1PatientClass.eAxm1DbTable.keratoOA25TypTable;
+              break;
+            case PhiType.Phi3_0:
+              table = Axm1PatientClass.eAxm1DbTable.keratoOATable;
+              tableTyp = Axm1PatientClass.eAxm1DbTable.keratoOATypTable;
               break;
             default:
               return false;
           }
           break;
-        case SelectType.Median:
-          switch (axm2Setting.DisplaySetting.KrtDeviceType) {
-            case KrtDeviceType.OA2000:
-              switch (axm2Setting.DisplaySetting.KrtPhiType) {
-                case PhiType.Phi2_0:
-                  table = Axm1PatientClass.eAxm1DbTable.keratoOA20TypTable;
-                  break;
-                case PhiType.Phi2_5:
-                  table = Axm1PatientClass.eAxm1DbTable.keratoOA25TypTable;
-                  break;
-                case PhiType.Phi3_0:
-                  table = Axm1PatientClass.eAxm1DbTable.keratoOATypTable;
-                  break;
-                default:
-                  return false;
-              }
+        case KrtDeviceType.MR:
+          switch (axm2Setting.DisplaySetting.KrtPhiType) {
+            case PhiType.Phi2_0:
+              table = Axm1PatientClass.eAxm1DbTable.kerato20Table;
+              tableTyp = Axm1PatientClass.eAxm1DbTable.kerato20TypTable;
               break;
-            case KrtDeviceType.MR:
-              switch (axm2Setting.DisplaySetting.KrtPhiType) {
-                case PhiType.Phi2_0:
-                  table = Axm1PatientClass.eAxm1DbTable.kerato20TypTable;
-                  break;
-                case PhiType.Phi2_5:
-                  table = Axm1PatientClass.eAxm1DbTable.kerato25TypTable;
-                  break;
-                case PhiType.Phi3_0:
-                  table = Axm1PatientClass.eAxm1DbTable.keratoTypTable;
-                  break;
-                default:
-                  return false;
-              }
+            case PhiType.Phi2_5:
+              table = Axm1PatientClass.eAxm1DbTable.kerato25Table;
+              tableTyp = Axm1PatientClass.eAxm1DbTable.kerato25TypTable;
+              break;
+            case PhiType.Phi3_0:
+              table = Axm1PatientClass.eAxm1DbTable.keratoTable;
+              tableTyp = Axm1PatientClass.eAxm1DbTable.keratoTypTable;
               break;
             default:
               return false;
@@ -659,6 +651,10 @@ namespace AxialManagerS_Converter.Components.Model {
           sql += " AND ST_DT BETWEEN";
           sql += (" '" + max + "' AND '" + min + "'");
         }
+
+        string sqlTyp = "SELECT * FROM " + Axm1PatientClass.Axm1DB_TableNames[(int)tableTyp];
+        sqlTyp += (" WHERE ID = '" + pt_id + "' AND ST_DT = ");
+
         using (var command = new SQLiteCommand(sql, connection)) {
           using (var reader = command.ExecuteReader()) {
             while (reader.Read()) {
@@ -693,6 +689,31 @@ namespace AxialManagerS_Converter.Components.Model {
                 [(int)Axm1PatientClass.eAxm1KeratoTable.manual]].ToString() == "y");
               krtList.IsRManualInput = manual;
               krtList.IsLManualInput = manual;
+
+              using (var commandTyp = new SQLiteCommand(sqlTyp + ("'" + st_dt + "'"), connection)) {
+                using (var readerTyp = commandTyp.ExecuteReader()) {
+                  while (readerTyp.Read()) {
+                    k1R = readerTyp[Axm1PatientClass.COLNAME_Axm1KeratoList
+                                           [(int)Axm1PatientClass.eAxm1KeratoTable.k1Od]].ToString();
+                    krtList.RK1_Typ_mm = (double.TryParse(k1R, out double dK1R_Typ)) ? dK1R_Typ : null;
+                    k2R = readerTyp[Axm1PatientClass.COLNAME_Axm1KeratoList
+                                           [(int)Axm1PatientClass.eAxm1KeratoTable.k2Od]].ToString();
+                    krtList.RK2_Typ_mm = (double.TryParse(k2R, out double dK2R_Typ)) ? dK2R_Typ : null;
+                    cylR = readerTyp[Axm1PatientClass.COLNAME_Axm1KeratoList
+                                           [(int)Axm1PatientClass.eAxm1KeratoTable.cylOd]].ToString();
+                    krtList.RCyl_Typ_d = (double.TryParse(cylR, out double dCylR_Typ)) ? dCylR_Typ : null;
+                    k1L = readerTyp[Axm1PatientClass.COLNAME_Axm1KeratoList
+                                           [(int)Axm1PatientClass.eAxm1KeratoTable.k1Os]].ToString();
+                    krtList.LK1_Typ_mm = (double.TryParse(k1L, out double dK1L_Typ)) ? dK1L_Typ : null;
+                    k2L = readerTyp[Axm1PatientClass.COLNAME_Axm1KeratoList
+                                           [(int)Axm1PatientClass.eAxm1KeratoTable.k2Os]].ToString();
+                    krtList.LK2_Typ_mm = (double.TryParse(k2L, out double dK2L_Typ)) ? dK2L_Typ : null;
+                    cylL = readerTyp[Axm1PatientClass.COLNAME_Axm1KeratoList
+                                           [(int)Axm1PatientClass.eAxm1KeratoTable.cylOs]].ToString();
+                    krtList.LCyl_Typ_d = (double.TryParse(cylL, out double dCylL_Typ)) ? dCylL_Typ : null;
+                  }
+                }
+              }
 
               // DBに書込
               execErrorCount += dBKrtData.SetKrt(krtList, axm2Setting);

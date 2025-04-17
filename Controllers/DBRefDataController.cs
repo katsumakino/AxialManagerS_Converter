@@ -23,7 +23,8 @@ namespace AxialManagerS_Converter.Controllers {
           // PostgreSQL Server 通信接続
           NpgsqlConnection sqlConnection = dbAccess.GetSqlConnection();
 
-          int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)setting.DisplaySetting.RefSelectType]) - 1;
+          int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)SelectType.Average]) - 1;
+          int selectTypId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)SelectType.Median]) - 1;
           int deviceId = Select_Device_ID(sqlConnection, DBConst.AxmDeviceType);
 
           // クエリコマンド実行
@@ -50,7 +51,16 @@ namespace AxialManagerS_Converter.Controllers {
             rec_Ref_r.c_d[selectId] = conditions.RC_d;
             rec_Ref_r.a_deg[selectId] = conditions.RA_deg;
             rec_Ref_r.se_d[selectId] = conditions.RS_d + conditions.RC_d / 2;
-            rec_Ref_r.is_exam_data = conditions.RS_d != null && conditions.RC_d != null && conditions.RA_deg != null;
+            rec_Ref_r.s_d[selectTypId] = conditions.RS_Typ_d;
+            rec_Ref_r.c_d[selectTypId] = conditions.RC_Typ_d;
+            rec_Ref_r.a_deg[selectTypId] = conditions.RA_Typ_deg;
+            rec_Ref_r.se_d[selectTypId] = conditions.RS_Typ_d + conditions.RC_Typ_d / 2;
+
+            if(setting.DisplaySetting.RefSelectType == SelectType.Average) {
+              rec_Ref_r.is_exam_data = conditions.RS_d != null && conditions.RC_d != null && conditions.RA_deg != null;
+            } else if (setting.DisplaySetting.RefSelectType == SelectType.Median) {
+              rec_Ref_r.is_exam_data = conditions.RS_Typ_d != null && conditions.RC_Typ_d != null && conditions.RA_Typ_deg != null;
+            }
             rec_Ref_r.measured_at = conditions.ExamDateTime;
 
             // DB登録
@@ -75,7 +85,16 @@ namespace AxialManagerS_Converter.Controllers {
             rec_Ref_l.c_d[selectId] = conditions.LC_d;
             rec_Ref_l.a_deg[selectId] = conditions.LA_deg;
             rec_Ref_l.se_d[selectId] = conditions.LS_d + conditions.LC_d / 2;
-            rec_Ref_l.is_exam_data = conditions.LS_d != null && conditions.LC_d != null && conditions.LA_deg != null;
+            rec_Ref_l.s_d[selectTypId] = conditions.LS_Typ_d;
+            rec_Ref_l.c_d[selectTypId] = conditions.LC_Typ_d;
+            rec_Ref_l.a_deg[selectTypId] = conditions.LA_Typ_deg;
+            rec_Ref_l.se_d[selectTypId] = conditions.LS_Typ_d + conditions.LC_Typ_d / 2;
+
+            if (setting.DisplaySetting.RefSelectType == SelectType.Average) {
+              rec_Ref_l.is_exam_data = conditions.LS_d != null && conditions.LC_d != null && conditions.LA_deg != null;
+            } else if (setting.DisplaySetting.RefSelectType == SelectType.Median) {
+              rec_Ref_l.is_exam_data = conditions.LS_Typ_d != null && conditions.LC_Typ_d != null && conditions.LA_Typ_deg != null;
+            }
             rec_Ref_l.measured_at = conditions.ExamDateTime;
 
             // DB登録
