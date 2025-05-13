@@ -67,6 +67,7 @@ namespace AxialManagerS_Converter.Components.Model {
         string destPath = Path.Combine(settingDirTopPath, settingFileName);
 
         axm2Setting = new();
+        axm2Setting.SetDefaultArray();  // 配列要素の初期化
 
         if (utilities.FileExists(destPath)) {
           // AXM2の設定ファイル読出し
@@ -104,9 +105,10 @@ namespace AxialManagerS_Converter.Components.Model {
     /// <param name="axm2Setting"></param>
     private void JsonSettingDataToGeneralSetting(in Axm1SettingClass.JsonSettingData? axm1Setting, ref GeneralSetting? axm2Setting) {
       if (axm1Setting == null) return; // 変換元無し
-      if (axm2Setting == null) axm2Setting = new();
-      if (axm2Setting.DisplaySetting == null) axm2Setting.DisplaySetting = new();
-      if (axm2Setting.OutPutSetting == null) axm2Setting.OutPutSetting = new();  // todo: 出力設定
+      if (axm2Setting == null || axm2Setting.DisplaySetting == null || axm2Setting.OutPutSetting == null) {
+        axm2Setting = new();
+        axm2Setting.SetDefaultArray();  // 配列要素の初期化
+      }
 
       // AXIAL 変換方式
       switch (axm1Setting.Axial_Converter_Type) {
@@ -181,6 +183,32 @@ namespace AxialManagerS_Converter.Components.Model {
         default:
           axm2Setting.DisplaySetting.PachyDeviceType = PachyDeviceType.OA2000;
           break;
+      }
+
+      // 出力ファイル名
+      if(axm2Setting.OutPutSetting.ExportFileItem != null && axm2Setting.OutPutSetting.ExportFileItem.Length == 10) {
+        axm2Setting.OutPutSetting.ExportFileItem[0] = (ExportFileItemType)axm1Setting.File_Item_Type_1;
+        axm2Setting.OutPutSetting.ExportFileItem[1] = (ExportFileItemType)axm1Setting.File_Item_Type_2;
+        axm2Setting.OutPutSetting.ExportFileItem[2] = (ExportFileItemType)axm1Setting.File_Item_Type_3;
+        axm2Setting.OutPutSetting.ExportFileItem[3] = (ExportFileItemType)axm1Setting.File_Item_Type_4;
+        axm2Setting.OutPutSetting.ExportFileItem[4] = (ExportFileItemType)axm1Setting.File_Item_Type_5;
+        axm2Setting.OutPutSetting.ExportFileItem[5] = (ExportFileItemType)axm1Setting.File_Item_Type_6;
+        axm2Setting.OutPutSetting.ExportFileItem[6] = (ExportFileItemType)axm1Setting.File_Item_Type_7;
+        axm2Setting.OutPutSetting.ExportFileItem[7] = (ExportFileItemType)axm1Setting.File_Item_Type_8;
+        axm2Setting.OutPutSetting.ExportFileItem[8] = (ExportFileItemType)axm1Setting.File_Item_Type_9;
+        axm2Setting.OutPutSetting.ExportFileItem[9] = (ExportFileItemType)axm1Setting.File_Item_Type_10;
+      }
+      
+      if(axm2Setting.OutPutSetting.ExportFileSeparate != null && axm2Setting.OutPutSetting.ExportFileSeparate.Length == 9) {
+        axm2Setting.OutPutSetting.ExportFileSeparate[0] = (ExportFileSeparateType)axm1Setting.File_Separate_Type_1;
+        axm2Setting.OutPutSetting.ExportFileSeparate[1] = (ExportFileSeparateType)axm1Setting.File_Separate_Type_2;
+        axm2Setting.OutPutSetting.ExportFileSeparate[2] = (ExportFileSeparateType)axm1Setting.File_Separate_Type_3;
+        axm2Setting.OutPutSetting.ExportFileSeparate[3] = (ExportFileSeparateType)axm1Setting.File_Separate_Type_4;
+        axm2Setting.OutPutSetting.ExportFileSeparate[4] = (ExportFileSeparateType)axm1Setting.File_Separate_Type_5;
+        axm2Setting.OutPutSetting.ExportFileSeparate[5] = (ExportFileSeparateType)axm1Setting.File_Separate_Type_6;
+        axm2Setting.OutPutSetting.ExportFileSeparate[6] = (ExportFileSeparateType)axm1Setting.File_Separate_Type_7;
+        axm2Setting.OutPutSetting.ExportFileSeparate[7] = (ExportFileSeparateType)axm1Setting.File_Separate_Type_8;
+        axm2Setting.OutPutSetting.ExportFileSeparate[8] = (ExportFileSeparateType)axm1Setting.File_Separate_Type_9;
       }
     }
 

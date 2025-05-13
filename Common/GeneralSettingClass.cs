@@ -2,19 +2,65 @@
 
 namespace AxialManagerS_Converter.Common {
   public class GeneralSetting {
-    public LoginSetting[] LoginSetting { get; set; } = {
-      new LoginSetting() {
-        IsAdmin = true,
-        ID = "admin",
-        Password = "admin"
-      }
-    };    //ログイン設定 //変更 LoginSetting→LoginSetting[]
-    public DisplaySettingClass DisplaySetting { get; set; } = new();//表示設定
-    //public TreatmentMethodSetting[] TreatmentMethodSetting { get; set; }//治療方法設定 //変更 TreatmentMethodSetting→TreatmentMethodSetting[]
-    public LicenseManage LicenseManage { get; set; } = new();//ライセンス管理
-    public OutPutSetting OutPutSetting { get; set; } = new();//出力設定
-    //public DatabaseSetting DatabaseSetting { get; set; }//データベース設定
-    //public NumberLayoutSetting NumberLayoutSetting { get; set; }
+
+    // Jsonファイル読込の場合、配列のデフォルト値は、上書きされずに残ってしまうため、ココで追加する
+    public void SetDefaultArray() {
+      // ログインユーザ設定
+      LoginSetting = [
+        new LoginSetting() {
+              IsAdmin = true,
+              ID = "admin",
+              Password = "admin"
+            }
+      ];
+
+      // 伸長評価用閾値
+      DisplaySetting.TreatmentAlertAgeThreshold = [
+       // todo: デフォルト値設定
+       new TreatmentAlertAgeThreshold(){
+             Age = 10,
+             StandardValue = 0.0,
+             ChangeAmount = 0.0,
+             AbnormalIncrementAmount = 0.0
+           },
+           new TreatmentAlertAgeThreshold() {
+             Age = 11,
+             StandardValue = 0.0,
+             ChangeAmount = 0.0,
+             AbnormalIncrementAmount = 0.0
+           }
+      ];
+
+      // 出力ファイル名
+      OutPutSetting.ExportFileItem = [
+        ExportFileItemType.eExportFileItem_PT_ID,
+            ExportFileItemType.eExportFileItem_EXAM_DATE,
+            ExportFileItemType.eExportFileItem_EXAM_TIME,
+            ExportFileItemType.eExportFileItem_MODEL_NAME_ALMANAGER,
+            ExportFileItemType.eExportFileItem_EYE_RL,
+            ExportFileItemType.eExportFileItem_EXTENSION_STRING,
+            ExportFileItemType.eExportFileItem_NONE,
+            ExportFileItemType.eExportFileItem_NONE,
+            ExportFileItemType.eExportFileItem_NONE,
+            ExportFileItemType.eExportFileItem_NONE
+      ];
+      OutPutSetting.ExportFileSeparate = [
+        ExportFileSeparateType.eExportFileSeparate_3,
+            ExportFileSeparateType.eExportFileSeparate_3,
+            ExportFileSeparateType.eExportFileSeparate_3,
+            ExportFileSeparateType.eExportFileSeparate_3,
+            ExportFileSeparateType.eExportFileSeparate_3,
+            ExportFileSeparateType.eExportFileSeparate_3,
+            ExportFileSeparateType.eExportFileSeparate_NONE,
+            ExportFileSeparateType.eExportFileSeparate_NONE,
+            ExportFileSeparateType.eExportFileSeparate_NONE
+      ];
+    }
+
+    public LoginSetting[]? LoginSetting { get; set; } // ログイン設定
+    public DisplaySettingClass DisplaySetting { get; set; } = new DisplaySettingClass();//表示設定
+    public LicenseManage LicenseManage { get; set; } = new LicenseManage();//ライセンス管理
+    public OutPutSetting OutPutSetting { get; set; } = new OutPutSetting();//出力設定
   }
 
   //ログインユーザ設定
@@ -49,6 +95,7 @@ namespace AxialManagerS_Converter.Common {
     public PhiType KrtPhiType { get; set; } = PhiType.Phi3_0;//Krt測定位置
 
     public KrtDeviceType KrtDeviceType { get; set; } = KrtDeviceType.OA2000;//Krt計測装置　角膜曲率
+    public KrtUnitType KrtUnitType { get; set; } = KrtUnitType.Mm;//Krt単位 mm
 
     public PachyDeviceType PachyDeviceType { get; set; } = PachyDeviceType.OA2000; //Pachy計測装置　角膜厚
 
@@ -62,29 +109,26 @@ namespace AxialManagerS_Converter.Common {
     public double VerticalAxisVariableLowerLimit { get; set; } = 20.0;//トレンドグラフ固定下限値
     public double VerticalAxisFixedUpperLimit { get; set; } = 40.0;//トレンドグラフ縦軸可変上限値
     public double VerticalAxisFixedLowerLimit { get; set; } = 20.0;//トレンドグラフ可変下限値
+
+    public bool BarcodeSearchSetting { get; set; } = true;//バーコード検索設定有効
+    public string BarcodeIDStartIndex { get; set; } = "1";//バーコードのID読み込み開始位置
+    public string BarcodeIDStringNum { get; set; } = "64";//バーコード　ID文字数
+
     public bool VerticalAxisPlotValue { get; set; } = true;//トレンドグラフプロット値表示
+
+    public bool MyopiaTendencyInitDisp { get; set; } = true;//近視眼の進行傾向初期表示
+    public bool ScormStudyInitDisp { get; set; } = false;//SCORM study初期表示
+    public bool PercentileLinearInitDisp { get; set; } = false;//小中学生の眼軸長パーセンタイル(直線)初期表示
+    public bool PercentileCurveInitDisp { get; set; } = false;//小中学生の眼軸長パーセンタイル(曲線)初期表示
+
     public bool VerticalAxisSampleValue { get; set; } = true;//トレンドグラフサンプル値表示
     public bool TreatInterventionAlert { get; set; } = true;//治療介入アラート表示(オプション機能？)
     public bool ComparisionDisplay { get; set; } = true;//比較表示
     public bool SuppressionRate { get; set; } = true;//抑制率表示
     public bool Evalucation { get; set; } = true;//評価表示
 
-    //治療介入アラート年代別閾値
-    public TreatmentAlertAgeThreshold[] TreatmentAlertAgeThreshold { get; set; } = {
-      // todo: デフォルト値設定
-      new TreatmentAlertAgeThreshold(){
-        Age = 10,
-        StandardValue = 0.0,
-        ChangeAmount = 0.0,
-        AbnormalIncrementAmount = 0.0
-      },
-      new TreatmentAlertAgeThreshold() {
-        Age = 11,
-        StandardValue = 0.0,
-        ChangeAmount = 0.0,
-        AbnormalIncrementAmount = 0.0
-      },
-    };
+    //伸長評価用年代別閾値
+    public TreatmentAlertAgeThreshold[]? TreatmentAlertAgeThreshold { get; set; }
   }
 
   //眼軸長変換方式の選択　測定した値の内どれで表示を行うか
@@ -134,6 +178,12 @@ namespace AxialManagerS_Converter.Common {
     AXM2//手入力
   }
 
+  public enum KrtUnitType {
+    None,//未設定
+    Mm,//mm
+    D//Diopter
+  }
+
   //Pachy計測装置　角膜厚
   public enum PachyDeviceType {
     None,//未設定
@@ -170,35 +220,22 @@ namespace AxialManagerS_Converter.Common {
     public double AbnormalIncrementAmount { get; set; }//注意変化量
   }
 
-  //治療方法設定
-  //public class TreatmentMethodSetting {
-  //  public int ID { get; set; }
-  //  public string TreatName { get; set; }//治療方法の名前
-  //  public RGBAColor RGBAColor { get; set; }//治療方法に割り当てられた色
-  //  public int SuppresionRate { get; set; }//抑制率
-  //}
-
-  //public class RGBAColor {
-  //  public int R { get; set; }//色のR値
-  //  public int G { get; set; }//色のG値
-  //  public int B { get; set; }//色のB値
-  //  public int A { get; set; }//色のA値
-  //}
-
   //ライセンス管理
   public class LicenseManage {
-    public string SerialNumber { get; set; } = default!;//シリアルナンバー
-    public string LicenseKey { get; set; } = default!;//ライセンスキー
-    public string LicenseName { get; set; } = default!;//ライセンス名
+    public string SerialNumber { get; set; } = "000A000000"!;//シリアルナンバー
+    public string LicenseKey { get; set; } = "000A"!;//ライセンスキー
+    public string LicenseName { get; set; } = "LicenseName"!;//ライセンス名
   }
 
   //出力設定
   public class OutPutSetting {
-    OutPutFileFormat OutPutFileFormat { get; set; } = OutPutFileFormat.CSV;//出力ファイル形式
+    public OutPutFileFormat OutPutFileFormat { get; set; } = OutPutFileFormat.CSV;//出力ファイル形式
     public bool PatientInfo { get; set; } = true;//被検者情報
     public bool PatientComment { get; set; } = true;//被検者コメント
     public bool MeasureDeviceName { get; set; } = true;//測定機器名
     public bool MeasureMethod { get; set; } = true;//測定方法
+    public ExportFileItemType[]? ExportFileItem { get; set; }
+    public ExportFileSeparateType[]? ExportFileSeparate { get; set; }
   }
 
   public enum OutPutFileFormat {
@@ -206,19 +243,123 @@ namespace AxialManagerS_Converter.Common {
     XML
   }
 
-  //public class DatabaseSetting {
-  //  public int ID { get; set; }//ユーザID
-  //  public string Password { get; set; }//パスワード
-  //  public string IPAdress { get; set; }//IPアドレス //変更 int→string
-  //  public int PortNumber { get; set; }//ポート番号
-  //}
+  public enum ExportFileItemType {
+    eExportFileItem_NONE = 0,
+    eExportFileItem_LASTNAME,
+    eExportFileItem_FIRSTNAME,
+    eExportFileItem_PT_ID,
+    eExportFileItem_EXAM_DATE,
+    eExportFileItem_EXAM_TIME,
+    eExportFileItem_EYE_RL,
+    eExportFileItem_EYE_ODOS,
+    eExportFileItem_MODEL_NAME_DEVICE,
+    eExportFileItem_MODEL_NAME_ALMANAGER,
+    eExportFileItem_EXTENSION_STRING,
+    eExportFileItem_EXTENSION_NUMBER,
+    MAX
+  }
 
-  ////ID桁/取り込み年齢設定
-  //public class NumberLayoutSetting {
-  //  public bool DigitLimit { get; set; }//ID桁制限切替
-  //  public bool AgeLimit { get; set; }//取り込み年齢設定切替
-  //  public int IDDigits { get; set; }//ID桁ぞろえ制限
-  //  public int AgeLimitUpper { get; set; }//年齢制限上限
-  //  public int AgeLimitLower { get; set; }//年齢制限下限
-  //}
+  public enum ExportFileSeparateType {
+    eExportFileSeparate_ALLNONE = 0,
+    eExportFileSeparate_NONE,
+    eExportFileSeparate_SPACE,
+    eExportFileSeparate_3,
+    eExportFileSeparate_4,
+    eExportFileSeparate_5,
+    eExportFileSeparate_6,
+    eExportFileSeparate_7,
+    eExportFileSeparate_8,
+    eExportFileSeparate_9,
+    eExportFileSeparate_10,
+    eExportFileSeparate_11,
+    eExportFileSeparate_12,
+    eExportFileSeparate_13,
+    eExportFileSeparate_14,
+    eExportFileSeparate_15,
+    eExportFileSeparate_16,
+    eExportFileSeparate_17,
+    eExportFileSeparate_18,
+    eExportFileSeparate_19,
+    MAX
+  }
+
+  public static class ExportFileDictionary {
+    // Enum と String のマッピング
+    public static Dictionary<string, ExportFileItemType> FileItemMapping = new() {
+    { "(None)",                ExportFileItemType.eExportFileItem_NONE                 },
+    { "Last Name",             ExportFileItemType.eExportFileItem_LASTNAME             },
+    { "First Name",            ExportFileItemType.eExportFileItem_FIRSTNAME            },
+    { "Patient ID",            ExportFileItemType.eExportFileItem_PT_ID                },
+    { "Date",                  ExportFileItemType.eExportFileItem_EXAM_DATE            },
+    { "Time",                  ExportFileItemType.eExportFileItem_EXAM_TIME            },
+    { "Eye(L/R/B)",            ExportFileItemType.eExportFileItem_EYE_RL               },
+    { "Eye(OS/OD/OU)",         ExportFileItemType.eExportFileItem_EYE_ODOS             },
+    { "Model Name(Device)",    ExportFileItemType.eExportFileItem_MODEL_NAME_DEVICE    },
+    { "Model Name(ALManager)", ExportFileItemType.eExportFileItem_MODEL_NAME_ALMANAGER },
+    { "Extension String",      ExportFileItemType.eExportFileItem_EXTENSION_STRING     },
+    { "Extension Number",      ExportFileItemType.eExportFileItem_EXTENSION_NUMBER     }
+  };
+
+    // Enum と String のマッピング
+    public static Dictionary<string, ExportFileSeparateType> FileSeparateMapping_first = new() {
+    { "(All None)", ExportFileSeparateType.eExportFileSeparate_ALLNONE },
+    { "(none)",     ExportFileSeparateType.eExportFileSeparate_NONE    },
+    { "(space)",    ExportFileSeparateType.eExportFileSeparate_SPACE   },
+    { "_",          ExportFileSeparateType.eExportFileSeparate_3       },
+    { "-",          ExportFileSeparateType.eExportFileSeparate_4       },
+    { "+",          ExportFileSeparateType.eExportFileSeparate_5       },
+    { ",",          ExportFileSeparateType.eExportFileSeparate_6       },
+    { "(",          ExportFileSeparateType.eExportFileSeparate_7       },
+    { ")",          ExportFileSeparateType.eExportFileSeparate_8       },
+    { "[",          ExportFileSeparateType.eExportFileSeparate_9       },
+    { "]",          ExportFileSeparateType.eExportFileSeparate_10      },
+    { "!",          ExportFileSeparateType.eExportFileSeparate_11      },
+    { "#",          ExportFileSeparateType.eExportFileSeparate_12      },
+    { "$",          ExportFileSeparateType.eExportFileSeparate_13      },
+    { "%",          ExportFileSeparateType.eExportFileSeparate_14      },
+    { "&",          ExportFileSeparateType.eExportFileSeparate_15      },
+    { "'",          ExportFileSeparateType.eExportFileSeparate_16      },
+    { "=",          ExportFileSeparateType.eExportFileSeparate_17      },
+    { "~",          ExportFileSeparateType.eExportFileSeparate_18      },
+    { "@",          ExportFileSeparateType.eExportFileSeparate_19      }
+  };
+
+    public static Dictionary<string, ExportFileSeparateType> FileSeparateMapping = new() {
+    { "(none)",     ExportFileSeparateType.eExportFileSeparate_NONE    },
+    { "(space)",    ExportFileSeparateType.eExportFileSeparate_SPACE   },
+    { "_",          ExportFileSeparateType.eExportFileSeparate_3       },
+    { "-",          ExportFileSeparateType.eExportFileSeparate_4       },
+    { "+",          ExportFileSeparateType.eExportFileSeparate_5       },
+    { ",",          ExportFileSeparateType.eExportFileSeparate_6       },
+    { "(",          ExportFileSeparateType.eExportFileSeparate_7       },
+    { ")",          ExportFileSeparateType.eExportFileSeparate_8       },
+    { "[",          ExportFileSeparateType.eExportFileSeparate_9       },
+    { "]",          ExportFileSeparateType.eExportFileSeparate_10      },
+    { "!",          ExportFileSeparateType.eExportFileSeparate_11      },
+    { "#",          ExportFileSeparateType.eExportFileSeparate_12      },
+    { "$",          ExportFileSeparateType.eExportFileSeparate_13      },
+    { "%",          ExportFileSeparateType.eExportFileSeparate_14      },
+    { "&",          ExportFileSeparateType.eExportFileSeparate_15      },
+    { "'",          ExportFileSeparateType.eExportFileSeparate_16      },
+    { "=",          ExportFileSeparateType.eExportFileSeparate_17      },
+    { "~",          ExportFileSeparateType.eExportFileSeparate_18      },
+    { "@",          ExportFileSeparateType.eExportFileSeparate_19      }
+  };
+  }
+
+  public class DatabaseSetting {
+    public int ID { get; set; }//ユーザID
+    public string Password { get; set; }//パスワード
+    public string IPAdress { get; set; }//IPアドレス //変更 int→string
+    public int PortNumber { get; set; }//ポート番号
+  }
+
+  //ID桁/取り込み年齢設定
+  public class NumberLayoutSetting {
+    public bool DigitLimit { get; set; }//ID桁制限切替
+    public bool AgeLimit { get; set; }//取り込み年齢設定切替
+    public int IDDigits { get; set; }//ID桁ぞろえ制限
+    public int AgeLimitUpper { get; set; }//年齢制限上限
+    public int AgeLimitLower { get; set; }//年齢制限下限
+  }
 }
