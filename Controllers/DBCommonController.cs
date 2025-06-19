@@ -1,7 +1,9 @@
 ﻿using AxialManagerS_Converter.Common;
 using Npgsql;
+using System;
 using System.Data;
 using System.Text;
+using System.Text.Json;
 
 namespace AxialManagerS_Converter.Controllers {
 
@@ -43,6 +45,17 @@ namespace AxialManagerS_Converter.Controllers {
 
           // DB接続情報取得
           DBAccessInfo info = new();
+
+          // todo: ファイルを削除し忘れると、他の施設で同じ設定を登録してしまうので、評価時の一時的な対応として追加する
+          // JSONファイルからDB接続情報を取得できるように
+          string filePath = "axm2dbsettings.json";
+          if (System.IO.File.Exists(filePath)) {
+            string jsonRead = System.IO.File.ReadAllText(filePath);
+            info = System.Text.Json.JsonSerializer.Deserialize<DBAccessInfo>(jsonRead) ?? info;
+          } else {
+            string jsonWrite = JsonSerializer.Serialize(info);
+            System.IO.File.WriteAllText(filePath, jsonWrite);
+          }
 
           string? ConnectionString = string.Format("Server={0};Port={1};Database={2};User Id={3};Password={4};Pooling={5};"
             , info.dbServer, info.dbPort, info.dbName, info.dbUserId, info.dbPassword, info.dbPooling);
