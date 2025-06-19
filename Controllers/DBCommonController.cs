@@ -15,7 +15,7 @@ namespace AxialManagerS_Converter.Controllers {
 
     public class DBAccessInfo {
       public string dbServer { get; set; } = "127.0.0.1";
-      public string dbPort { get; set; } = "5435";
+      public string dbPort { get; set; } = "5432";              // todo: 5435だとダメだった
       public string dbName { get; set; } = "AxmTestDatabase";   // todo: 名称変更
       public string dbUserId { get; set; } = "postgres";
       public string dbPassword { get; set; } = "t*ENG-5931";

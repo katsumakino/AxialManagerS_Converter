@@ -84,9 +84,9 @@ namespace AxialManagerS_Converter.Controllers {
             }            
           }
         } catch {
+          result = false;
         } finally {
           if (!result) {
-            // todo: Error通知
             string filePath = "C:\\TomeyApp\\AxialManager2\\output.txt";
             string content = "AXIAL:" + conditions.PatientID;
 
@@ -134,7 +134,7 @@ namespace AxialManagerS_Converter.Controllers {
         recOpax.iol_ref_ind = 0;
         recOpax.vitreous_ref_ind = 0;
 
-        recOpax.is_caliper = false;
+        recOpax.is_caliper.AddRange(new List<bool?>() { false, false, false });
         recOpax.is_reliability = false;
         recOpax.reliability.AddRange(new List<string?>() { string.Empty, string.Empty, string.Empty });
         recOpax.data_path = string.Empty;
@@ -276,7 +276,7 @@ public class ExamOptaxialRec {
   public double? lens_ref_ind { get; set; }
   public double? iol_ref_ind { get; set; }
   public double? vitreous_ref_ind { get; set; }
-  public bool? is_caliper { get; set; }
+  public List<bool?> is_caliper { get; set; } = new List<bool?>() { false, false, false };
   public bool? is_reliability { get; set; }
   public List<string?> reliability { get; set; } = new List<string?>();
   public string? data_path { get; set; } = string.Empty;

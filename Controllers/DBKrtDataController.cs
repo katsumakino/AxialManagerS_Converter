@@ -123,9 +123,9 @@ namespace AxialManagerS_Converter.Controllers {
             }
           }
         } catch {
+          result = false;
         } finally {
           if (!result) {
-            // todo: Error通知
             string filePath = "C:\\TomeyApp\\AxialManager2\\output.txt";
             string content = "KRT:" + conditions.PatientID;
 

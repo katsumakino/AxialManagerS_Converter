@@ -94,9 +94,9 @@ namespace AxialManagerS_Converter.Controllers {
             result &= InsertAxmPatient(sqlConnection, axmPatientRec);
           }
         } catch {
+          result = false;
         } finally {
           if (!result) {
-            // todo: Error通知
             string filePath = "C:\\TomeyApp\\AxialManager2\\output.txt";
             string content = "PATIENT:" + conditions.ID;
 

@@ -6,12 +6,15 @@
 
     // Jsonファイル読込の場合、配列のデフォルト値は、上書きされずに残ってしまうため、ココで追加する
     public void SetDefaultArray() {
+      // パスワードを暗号化
+      var encryptPasword = CryptoHelper.Encrypt("admin");
+
       // ログインユーザ設定
       LoginSetting = [
         new LoginSetting() {
               IsAdmin = true,
               ID = "admin",
-              Password = "admin"
+              Password = encryptPasword
             }
       ];
 

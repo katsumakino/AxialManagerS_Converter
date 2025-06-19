@@ -56,9 +56,14 @@ namespace AxialManagerS_Converter.Controllers {
           }, sqlConnection);
 
         } catch {
+          result = false;
         } finally {
           if (!result) {
-            // todo: Error通知
+            string filePath = "C:\\TomeyApp\\AxialManager2\\output.txt";
+            string content = "AXMCOMMENT:" + conditions.PatientID;
+
+            // ファイルの末尾に書き込む
+            System.IO.File.AppendAllText(filePath, content + Environment.NewLine);
           }
 
           // PostgreSQL Server 通信切断

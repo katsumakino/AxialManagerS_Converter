@@ -52,9 +52,9 @@ namespace AxialManagerS_Converter.Controllers {
           }, sqlConnection);
 
         } catch {
+          result = false;
         } finally {
           if (!result) {
-            // todo: Error通知
             string filePath = "C:\\TomeyApp\\AxialManager2\\output.txt";
             string content = "TREATMENTINFO:" + conditions.TreatName;
 
@@ -124,10 +124,9 @@ namespace AxialManagerS_Converter.Controllers {
           }, sqlConnection);
 
         } catch {
+          result = false;
         } finally {
-
           if (!result) {
-            // todo: Error通知
             string filePath = "C:\\TomeyApp\\AxialManager2\\output.txt";
             string content = "TREATMENT:" + conditions.PatientID;
 
@@ -159,7 +158,7 @@ namespace AxialManagerS_Converter.Controllers {
         id = Select_TreatmentTypeId_By_TreatmentName(sqlConnection, treatmentName);
         if (id == -1) {
           // 新規登録なら、ID割り当て
-          id = SelectMaxTreatmentId(sqlConnection);
+          id = SelectMaxTreatmentTypeId(sqlConnection);
         }
       } catch {
       } finally {
@@ -327,7 +326,6 @@ namespace AxialManagerS_Converter.Controllers {
       return result;
     }
 
-    // todo: １つにまとめられる
     // treatment_idの最大値取得
     public static int SelectMaxTreatmentId(NpgsqlConnection sqlConnection) {
       int result = -1;
