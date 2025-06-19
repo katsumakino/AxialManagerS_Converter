@@ -1,10 +1,10 @@
 ﻿namespace AxialManagerS_Converter.Common {
-  //患者情報
+  //被検者情報
   public class PatientInfo {
     public bool Mark { get; set; }                      //お気に入り(仮)
     public string ID { get; set; } = default!;
-    public string FamilyName { get; set; } = default!;  //患者姓
-    public string FirstName { get; set; } = default!;   //患者名
+    public string FamilyName { get; set; } = default!;  //被検者姓
+    public string FirstName { get; set; } = default!;   //被検者名
     public Gender Gender { get; set; }                  //性別
     public int Age { get; set; }                        //年齢
     public DateTime? BirthDate { get; set; }            //生年月日
@@ -33,29 +33,30 @@
 
   //検索条件
   public class PatientSearch() {
-    public string IdOrName { get; set; } = default!;            //IDまたは名前
-    public Gender Gender { get; set; }                          //性別
-    public bool IsAge { get; set; }                             //年齢検索の有無
-    public int AgeMin { get; set; }                             //年齢下限
-    public int AgeMax { get; set; }                             //年齢上限
-    public bool IsAxial { get; set; }                           //眼軸長範囲検索の有無
-    public double AxialMin { get; set; }                        //眼軸長下限
-    public double AxialMax { get; set; }                        //眼軸長上限
-    public bool IsExamDate { get; set; }                        //測定日検索の有無
-    public DateTime? ExamDateMin { get; set; }                  //最新測定日下限
-    public DateTime? ExamDateMax { get; set; }                  //最新測定日上限
-    public int[] TreatmentType { get; set; } = new int[5];      //治療方法(最大5つ)
-    public int TreatmentTypeCount { get; set; }                 //治療方法検索条件数
-    public string PatientComment { get; set; } = default!;      //患者コメント
-    public bool IsMark { get; set; }                            //お気に入り患者のみ
-    public bool IsSameID { get; set; }                          //同一ID患者のみ
+    public string IdOrName { get; set; } = default!;                      //IDまたは名前
+    public Gender Gender { get; set; } = Gender.none;                     //性別
+    public bool IsAge { get; set; } = true;                               //年齢検索の有無
+    public int AgeMin { get; set; } = 0;                                  //年齢下限
+    public int AgeMax { get; set; } = 25;                                 //年齢上限
+    public bool IsAxial { get; set; } = false;                            //眼軸長範囲検索の有無
+    public double AxialMin { get; set; } = 20;                            //眼軸長下限
+    public double AxialMax { get; set; } = 28;                            //眼軸長上限
+    public bool IsExamDate { get; set; } = true;                          //測定日検索の有無
+    // todo: 開発時、1年間のデータを検索する用に設定
+    public DateTime? ExamDateMin { get; set; } = DateTime.Today.AddYears(-1);          //最新測定日下限
+    public DateTime? ExamDateMax { get; set; } = DateTime.Today;          //最新測定日上限
+    public int[] TreatmentType { get; set; } = { -1, -1, -1, -1, -1 };                //治療方法(最大5つ)
+    public int TreatmentTypeCount { get; set; }                           //治療方法検索条件数
+    public string PatientComment { get; set; } = default!;                //患者コメント
+    public bool IsMark { get; set; } = false;                             //お気に入り患者のみ
+    public bool IsSameID { get; set; } = false;                           //同一ID患者のみ
   }
 
   //眼軸長(データ表示/書込に使用するもの)
   public class AxialList {
     public string? PatientID { get; set; } = default!;   //患者ID
-    public string? RExamID { get; set; } = default!;     //右測定データID
-    public string? LExamID { get; set; } = default!;     //左測定データID
+    public int? RExamID { get; set; } = default!;     //右測定データID
+    public int? LExamID { get; set; } = default!;     //左測定データID
     public double? RAxial { get; set; }                  //右眼軸長
     public double? LAxial { get; set; }                  //左眼軸長
     public DateTime? ExamDateTime { get; set; }         //測定日
@@ -65,7 +66,7 @@
 
   // DBから取得する眼軸長データ
   public class AxialData {
-    public string? ID { get; set; } = default!;                      //測定データID
+    public int? ID { get; set; } = default!;                      //測定データID
     public List<double?> Axial { get; set; } = new List<double?>(); //眼軸長
     public EyeType EyeId { get; set; }                              //左右眼情報
     public int? DeviceID { get; set; }                               //測定装置ID
@@ -77,8 +78,8 @@
   //ケラト(データ表示/書込に使用するもの)
   public class KrtList {
     public string? PatientID { get; set; } = default!;   //患者ID
-    public string? RExamID { get; set; } = default!;     //右測定データID
-    public string? LExamID { get; set; } = default!;     //左測定データID
+    public int? RExamID { get; set; } = default!;     //右測定データID
+    public int? LExamID { get; set; } = default!;     //左測定データID
     public double? RK1_mm { get; set; }                  //右角膜曲率半径(弱主経線)[mm]
     public double? RK1_d { get; set; }                   //右角膜曲率屈折力(弱主経線)[D]
     public double? RK2_mm { get; set; }                  //右角膜曲率平均(強主経線)[mm]
@@ -114,7 +115,7 @@
 
   //DBから取得するケラトデータ
   public class KrtData {
-    public string? ID { get; set; } = default!;  //測定データID
+    public int? ID { get; set; } = default!;  //測定データID
     public List<double?> K1_mm { get; set; } = new List<double?>();  //角膜曲率半径(弱主経線)[mm]
     public List<double?> K1_d { get; set; } = new List<double?>();   //角膜曲率屈折力(弱主経線)[D]
     public List<double?> K2_mm { get; set; } = new List<double?>();  //角膜曲率平均(強主経線)[mm]
@@ -138,8 +139,8 @@
   //屈折力(データ表示/書込に使用するもの)
   public class RefList {
     public string? PatientID { get; set; } = default!;   //患者ID
-    public string? RExamID { get; set; } = default!;     //右測定データID
-    public string? LExamID { get; set; } = default!;     //左測定データID
+    public int? RExamID { get; set; } = default!;     //右測定データID
+    public int? LExamID { get; set; } = default!;     //左測定データID
     public double? RS_d { get; set; }                    //右球面度数[D]
     public double? RC_d { get; set; }                    //右乱視度数[D]
     public int? RA_deg { get; set; }                     //右乱視軸[°]
@@ -163,7 +164,7 @@
 
   // DBから取得する他覚屈折力データ
   public class RefData {
-    public string? ID { get; set; } = default!;                      //測定データID
+    public int? ID { get; set; } = default!;                      //測定データID
     public List<double?> S_d { get; set; } = new List<double?>();   //球面度数[D]
     public List<double?> C_d { get; set; } = new List<double?>();   //乱視度数[D]
     public List<int?> A_deg { get; set; } = new List<int?>();       //乱視軸[°]
@@ -176,7 +177,7 @@
 
   // DBから取得する自覚屈折力データ
   public class SciRefData {
-    public string? ID { get; set; } = default!;          //測定データID
+    public int? ID { get; set; } = default!;          //測定データID
     public double? S_d { get; set; }                     //球面度数[D]
     public double? C_d { get; set; }                     //乱視度数[D]
     public int? A_deg { get; set; }                      //乱視軸[°]
@@ -190,8 +191,8 @@
   //中央角膜厚(データ表示/書込に使用するもの)
   public class PachyList {
     public string? PatientID { get; set; } = default!;   //患者ID
-    public string? RExamID { get; set; } = default!;     //右測定データID
-    public string? LExamID { get; set; } = default!;     //左測定データID
+    public int? RExamID { get; set; } = default!;     //右測定データID
+    public int? LExamID { get; set; } = default!;     //左測定データID
     public double? RPachy { get; set; }                  //右眼中央角膜厚
     public double? LPachy { get; set; }                  //左眼中央角膜厚
     public DateTime? ExamDateTime { get; set; }         //測定日
@@ -201,7 +202,7 @@
 
   // DBから取得する中央角膜厚データ
   public class PachyData {
-    public string? ID { get; set; } = default!;                      //測定データID
+    public int? ID { get; set; } = default!;                      //測定データID
     public List<double?> Pachy { get; set; } = new List<double?>(); //中央角膜厚
     public EyeType EyeId { get; set; }                              //左右眼情報
     public int? DeviceID { get; set; }                               //測定装置ID
@@ -212,8 +213,8 @@
   //瞳孔径(データ表示/書込に使用するもの)
   public class DiaList {
     public string? PatientID { get; set; } = default!;   //患者ID
-    public string? RExamID { get; set; } = default!;     //右測定データID
-    public string? LExamID { get; set; } = default!;     //左測定データID
+    public int? RExamID { get; set; } = default!;     //右測定データID
+    public int? LExamID { get; set; } = default!;     //左測定データID
     public double? RPupil { get; set; }                  //右瞳孔径
     public double? LPupil { get; set; }                  //左瞳孔径
     public DateTime? ExamDateTime { get; set; }         //測定日
@@ -223,7 +224,7 @@
 
   // DBから取得する瞳孔径データ
   public class DiaData {
-    public string? ID { get; set; } = default!;                      //測定データID
+    public int? ID { get; set; } = default!;                      //測定データID
     public double? Pupil { get; set; }                               //瞳孔径
     public EyeType EyeId { get; set; }                              //左右眼情報
     public int? DeviceID { get; set; }                               //測定装置ID
@@ -234,8 +235,8 @@
   //視力(データ表示/書込に使用するもの)
   public class SightList {
     public string? PatientID { get; set; } = default!;   //患者ID
-    public string? RExamID { get; set; } = default!;     //右測定データID
-    public string? LExamID { get; set; } = default!;     //左測定データID
+    public int? RExamID { get; set; } = default!;     //右測定データID
+    public int? LExamID { get; set; } = default!;     //左測定データID
     public double? RSight { get; set; }                  //右眼視力
     public double? LSight { get; set; }                  //左眼視力
     public DateTime? ExamDateTime { get; set; }         //測定日
@@ -243,7 +244,7 @@
 
   // DBから取得する視力データ
   public class SightData {
-    public string? ID { get; set; } = default!;                      //測定データID
+    public int? ID { get; set; } = default!;                      //測定データID
     public double? Sight { get; set; }                               //視力
     public EyeType EyeId { get; set; }                              //左右眼情報
     public int? DeviceID { get; set; }                               //測定装置ID
@@ -251,17 +252,23 @@
     public DateTime? ExamDateTime { get; set; }                     //測定日時
   }
 
+  public class PatientIdInfo {
+    public string PatientID { get; set; } = default!;       //被検者ID
+    public string? SamePatientID { get; set; } = default!;   //同一被検者ID
+    public bool IsSameID { get; set; } = false;             //同一被検者ID有無
+  }
+
   // 測定データ移動用クラス
   public class MoveExamData {
-    public string? RExamID { get; set; } = default!;           // 測定データID(右)
-    public string? LExamID { get; set; } = default!;           // 測定データID(左)
-    public string? ChangePatientID { get; set; } = default!;  // 移動先被検者ID
+    public int? RExamID { get; set; } = default!;           // 測定データID(右)
+    public int? LExamID { get; set; } = default!;           // 測定データID(左)
+    public string? ChangePatientUUID { get; set; } = default!;  // 移動先被検者ID
   }
 
   // コメントデータ移動用クラス
   public class MoveCommentData {
-    public string? CommentID { get; set; } = default!;           // 測定データID
-    public string? ChangePatientID { get; set; } = default!;  // 移動先被検者ID
+    public int? CommentID { get; set; } = default!;           // 測定データID
+    public string? ChangePatientUUID { get; set; } = default!;  // 移動先被検者ID
   }
 
   // ↑ ここまで追加項目
@@ -274,7 +281,6 @@
     both,
   }
 
-  // todo: Patientではないかも
   //治療方法設定
   public class TreatmentMethodSetting {
     public int ID { get; set; }
@@ -291,8 +297,7 @@
 
     //色の比較
     public override bool Equals(object? obj) {
-      if (obj is RGBAColor color)
-      {
+      if (obj is RGBAColor color) {
         return R == color.R && G == color.G && B == color.B && A == color.A;
       }
       return false;
@@ -309,7 +314,7 @@
 
   public class TreatmentDataRequest {
     public string PatientID { get; set; } = default!;       //患者ID
-    public TreatmentData TreatmentData { get; set; } = default!;
+    public TreatmentData TreatmentData { get; set; } = new TreatmentData();
   }
 
   public class TreatmentDataSeparateRequest {
@@ -323,6 +328,7 @@
     public AxmCommentType CommentType { get; set; } = 0;    //コメントタイプ
     public string Description { get; set; } = default!;     //コメント
     public DateTime? ExamDateTime { get; set; }             //測定日時
+    public DateTime? UpdateDateTime { get; set; }           //最終更新日時
   }
 
   public class AxmCommentRequest {

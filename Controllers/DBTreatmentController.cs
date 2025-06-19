@@ -244,8 +244,8 @@ namespace AxialManagerS_Converter.Controllers {
       stringBuilder.Append(_onconflict("pk_axm_treatment"));
       stringBuilder.Append(_doupdateexam(COLNAME_AxmTreatmentList[(int)eAxmTreatment.updated_at], DateTime.Now));
       stringBuilder.Append(_doupdatevalue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.treatmenttype_id], rec.treatmenttype_id.ToString()));
-      stringBuilder.Append(_doupdatevalue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.start_at], _DateTimeToObject(rec.start_at).ToString()));
-      stringBuilder.Append(_doupdatevalue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.end_at], _DateTimeToObject(rec.end_at).ToString()));
+      stringBuilder.Append(_doupdatevalue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.start_at], rec.start_at?.ToString("o")));
+      stringBuilder.Append(_doupdatevalue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.end_at], rec.end_at?.ToString("o")));
       stringBuilder.Append(";");
       int num = 0;
       // SQLコマンド実行
@@ -253,8 +253,8 @@ namespace AxialManagerS_Converter.Controllers {
         sqlCommand.Parameters.AddWithValue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.treatment_id], rec.treatment_id);
         sqlCommand.Parameters.AddWithValue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.treatmenttype_id], rec.treatmenttype_id);
         sqlCommand.Parameters.AddWithValue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.pt_uuid], Guid.Parse(rec.pt_uuid));
-        sqlCommand.Parameters.AddWithValue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.start_at], _DateTimeToObject(rec.start_at));
-        sqlCommand.Parameters.AddWithValue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.end_at], _DateTimeToObject(rec.end_at));
+        sqlCommand.Parameters.AddWithValue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.start_at], (object?)rec.start_at ?? DBNull.Value);
+        sqlCommand.Parameters.AddWithValue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.end_at], (object?)rec.end_at ?? DBNull.Value);
         sqlCommand.Parameters.AddWithValue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.created_at], _DateTimeToObject(rec.created_at));
         sqlCommand.Parameters.AddWithValue(COLNAME_AxmTreatmentList[(int)eAxmTreatment.updated_at], _DateTimeToObject(rec.updated_at));
         num = sqlCommand.ExecuteNonQuery();

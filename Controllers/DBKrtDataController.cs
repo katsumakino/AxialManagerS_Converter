@@ -257,8 +257,8 @@ namespace AxialManagerS_Converter.Controllers {
     public static string[] COLNAME_ExamKrtList = new string[(int)eExamKrt.MAX]
     {
       "exam_id", "examtype_id", "eye_id", "device_id", "is_exam_data", "comment", "select_id", "phi_id", "is_meas_auto", "k1_mm"
-      , "k1_d", "k1_axis_deg", "k2_mm", "k2_d", "k2_axis_deg", "avek_mm", "avek_d", "k_index", "cyl_d", "axis_deg", "is_reliabillty"
-      , "reliabillty", "data_path","measured_at", "updated_at", "created_at"
+      , "k1_d", "k1_axis_deg", "k2_mm", "k2_d", "k2_axis_deg", "avek_mm", "avek_d", "k_index", "cyl_d", "axis_deg", "is_reliability"
+      , "reliability", "data_path","measured_at", "updated_at", "created_at"
     };
 
     public enum eExamKrt {

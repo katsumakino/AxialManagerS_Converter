@@ -105,12 +105,9 @@ namespace AxialManagerS_Converter.Controllers {
 
     public static ExamOptaxialRec MakeOptaxialRec(int examId, string posEye, FittingsType fittingsType, int deviceId, NpgsqlConnection sqlConnection) {
 
-      // todo: Target_EYESとFITTINGSのDBテーブルを入替
       int selectId = Select_SelectTypeID(sqlConnection, DBConst.SELECT_TYPE[(int)DBConst.SelectType.none]);
-      //int fittingId = Select_FittingId_By_FittingType(sqlConnection, DBConst.FITTINGS_TYPE[(int)fittingsType]);
-      //int targetEyeId = Select_TargetEyeId_By_TargetEyeType(sqlConnection, DBConst.TARGET_EYE_TYPE[(int)DBConst.TargetEyeType.none]);
-      int fittingId = Select_FittingId_By_FittingType(sqlConnection, DBConst.TARGET_EYE_TYPE[(int)DBConst.TargetEyeType.none]);
-      int targetEyeId = Select_TargetEyeId_By_TargetEyeType(sqlConnection, DBConst.FITTINGS_TYPE[(int)fittingsType]);
+      int fittingId = Select_FittingId_By_FittingType(sqlConnection, DBConst.FITTINGS_TYPE[(int)fittingsType]);
+      int targetEyeId = Select_TargetEyeId_By_TargetEyeType(sqlConnection, DBConst.TARGET_EYE_TYPE[(int)DBConst.TargetEyeType.none]);
 
       var recOpax = new ExamOptaxialRec();
       try {
@@ -220,7 +217,7 @@ namespace AxialManagerS_Converter.Controllers {
     {
       "exam_id", "examtype_id", "eye_id", "device_id", "is_exam_data", "comment", "select_id", "target_eye_id", "fitting_id", "iol_eye_id", "is_meas_auto",
       "axial_mm", "sd", "snr", "is_average_ref_ind", "axial_ref_ind", "pachy_ref_ind", "acd_ref_ind", "lens_ref_ind", "iol_ref_ind", "vitreous_ref_ind",
-      "is_caliper", "is_reliabillty", "reliabillty", "data_path", "measured_at", "updated_at", "created_at"
+      "is_caliper", "is_reliability", "reliability", "data_path", "measured_at", "updated_at", "created_at"
     };
 
     public enum eExamOptAxial {

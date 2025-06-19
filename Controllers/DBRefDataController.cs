@@ -222,8 +222,8 @@ namespace AxialManagerS_Converter.Controllers {
     public static string[] COLNAME_ExamRefList = new string[(int)eExamRef.MAX]
     {
       "exam_id", "examtype_id", "eye_id", "device_id", "is_exam_data", "comment", "select_id", "is_meas_auto"
-      ,"is_human_eye_correction", "s_d", "c_d", "a_deg", "se_d", "vd_mm", "is_reliabillty"
-      , "reliabillty", "data_path","measured_at", "updated_at", "created_at"
+      ,"is_human_eye_correction", "s_d", "c_d", "a_deg", "se_d", "vd_mm", "is_reliability"
+      , "reliability", "data_path","measured_at", "updated_at", "created_at"
     };
 
     public enum eExamRef {

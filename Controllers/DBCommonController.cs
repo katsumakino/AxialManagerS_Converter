@@ -13,6 +13,15 @@ namespace AxialManagerS_Converter.Controllers {
 
     private static NpgsqlConnection sqlConnection = null;
 
+    public class DBAccessInfo {
+      public string dbServer { get; set; } = "127.0.0.1";
+      public string dbPort { get; set; } = "5435";
+      public string dbName { get; set; } = "AxmTestDatabase";   // todo: 名称変更
+      public string dbUserId { get; set; } = "postgres";
+      public string dbPassword { get; set; } = "t*ENG-5931";
+      public string dbPooling { get; set; } = "true";
+    }
+
     private DBAccess() {
     }
 
@@ -32,16 +41,11 @@ namespace AxialManagerS_Converter.Controllers {
       try {
         if (sqlConnection == null || sqlConnection.State != ConnectionState.Open) {
 
-          // todo: DB接続情報取得
-          string dbServer = "Tomey201809-05.tomey.local";
-          string dbPort = "5432";
-          string dbName = "AXMDB_250213";
-          string dbUserId = "postgres";
-          string dbPassword = "eng-4f";
-          string dbPooling = "true";
+          // DB接続情報取得
+          DBAccessInfo info = new();
 
           string? ConnectionString = string.Format("Server={0};Port={1};Database={2};User Id={3};Password={4};Pooling={5};"
-            , dbServer, dbPort, dbName, dbUserId, dbPassword, dbPooling);
+            , info.dbServer, info.dbPort, info.dbName, info.dbUserId, info.dbPassword, info.dbPooling);
 
           // PostgreSQL Server 通信接続
           sqlConnection = new(ConnectionString);

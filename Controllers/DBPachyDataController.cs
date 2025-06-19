@@ -218,7 +218,7 @@ namespace AxialManagerS_Converter.Controllers {
     {
       "exam_id", "examtype_id", "eye_id", "device_id", "is_exam_data", "comment", "select_id", "target_eye_id", "fitting_id", "is_meas_auto",
       "pachy_um", "oct_sd", "oct_snr", "is_oct_average_ref_ind", "oct_pachy_ref_ind", "is_us_velocity", "us_velocity_mpers", "is_us_bias_offset_um",
-      "us_bias_offset_um", "us_bias_offset_per", "is_em_us_correction", "em_us_correction_um", "is_reliabillty", "reliabillty", "data_path",
+      "us_bias_offset_um", "us_bias_offset_per", "is_em_us_correction", "em_us_correction_um", "is_reliability", "reliability", "data_path",
       "measured_at", "updated_at", "created_at"
     };
 

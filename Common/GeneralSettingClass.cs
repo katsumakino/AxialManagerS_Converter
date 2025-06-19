@@ -1,7 +1,8 @@
-﻿using System.ComponentModel;
-
-namespace AxialManagerS_Converter.Common {
+﻿namespace AxialManagerS_Converter.Common {
   public class GeneralSetting {
+
+    public GeneralSetting() {
+    }
 
     // Jsonファイル読込の場合、配列のデフォルト値は、上書きされずに残ってしまうため、ココで追加する
     public void SetDefaultArray() {
@@ -16,19 +17,97 @@ namespace AxialManagerS_Converter.Common {
 
       // 伸長評価用閾値
       DisplaySetting.TreatmentAlertAgeThreshold = [
-       // todo: デフォルト値設定
+       // todo: 正常値のデフォルト値設定
+       new TreatmentAlertAgeThreshold(){
+             Age = 7,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.179,
+             AbnormalIncrementAmount = 0.507
+           },
+       new TreatmentAlertAgeThreshold(){
+             Age = 8,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.14,
+             AbnormalIncrementAmount = 0.389
+           },
+       new TreatmentAlertAgeThreshold(){
+             Age = 9,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.112,
+             AbnormalIncrementAmount = 0.306
+           },
        new TreatmentAlertAgeThreshold(){
              Age = 10,
-             StandardValue = 0.0,
-             ChangeAmount = 0.0,
-             AbnormalIncrementAmount = 0.0
+             //StandardValue = 0.0,
+             ChangeAmount = 0.091,
+             AbnormalIncrementAmount = 0.246
            },
-           new TreatmentAlertAgeThreshold() {
+       new TreatmentAlertAgeThreshold() {
              Age = 11,
-             StandardValue = 0.0,
-             ChangeAmount = 0.0,
-             AbnormalIncrementAmount = 0.0
-           }
+             //StandardValue = 0.0,
+             ChangeAmount = 0.076,
+             AbnormalIncrementAmount = 0.20
+           },
+       new TreatmentAlertAgeThreshold(){
+             Age = 12,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.064,
+             AbnormalIncrementAmount = 0.166
+           },
+       new TreatmentAlertAgeThreshold(){
+             Age = 13,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.055,
+             AbnormalIncrementAmount = 0.139
+           },
+       new TreatmentAlertAgeThreshold(){
+             Age = 14,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.048,
+             AbnormalIncrementAmount = 0.117
+           },
+       new TreatmentAlertAgeThreshold(){
+             Age = 15,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.042,
+             AbnormalIncrementAmount = 0.099
+           },
+       new TreatmentAlertAgeThreshold(){
+             Age = 16,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.037,
+             AbnormalIncrementAmount = 0.085
+           },
+       new TreatmentAlertAgeThreshold(){
+             Age = 17,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.033,
+             AbnormalIncrementAmount = 0.072
+           },
+       new TreatmentAlertAgeThreshold(){
+             Age = 18,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.029,
+             AbnormalIncrementAmount = 0.062
+           },
+       new TreatmentAlertAgeThreshold(){
+             Age = 19,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.026,
+             AbnormalIncrementAmount = 0.053
+           },
+       new TreatmentAlertAgeThreshold(){
+             Age = 20,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.024,
+             AbnormalIncrementAmount = 0.046
+           },
+       new TreatmentAlertAgeThreshold(){
+             Age = 21,
+             //StandardValue = 0.0,
+             ChangeAmount = 0.022,
+             AbnormalIncrementAmount = 0.04
+           },
       ];
 
       // 出力ファイル名
@@ -59,8 +138,11 @@ namespace AxialManagerS_Converter.Common {
 
     public LoginSetting[]? LoginSetting { get; set; } // ログイン設定
     public DisplaySettingClass DisplaySetting { get; set; } = new DisplaySettingClass();//表示設定
+                                                                                        //public TreatmentMethodSetting[] TreatmentMethodSetting { get; set; }//治療方法設定 //変更 TreatmentMethodSetting→TreatmentMethodSetting[]
     public LicenseManage LicenseManage { get; set; } = new LicenseManage();//ライセンス管理
     public OutPutSetting OutPutSetting { get; set; } = new OutPutSetting();//出力設定
+                                                                           //public DatabaseSetting DatabaseSetting { get; set; }//データベース設定
+                                                                           //public NumberLayoutSetting NumberLayoutSetting { get; set; }
   }
 
   //ログインユーザ設定
@@ -73,7 +155,6 @@ namespace AxialManagerS_Converter.Common {
   public class DisplaySettingClass {
 
     //グラフ・測定結果表示の切り替え設定
-    public bool IsAxialVisible { get; set; } = true;//眼軸長表示
     public bool IsRefSubVisible { get; set; } = true;//Ref自覚値表示
     public bool IsRefObjVisible { get; set; } = true;//Ref他覚値表示
     public bool IsRefCalcVisible { get; set; } = true;//Ref算出値表示
@@ -101,6 +182,9 @@ namespace AxialManagerS_Converter.Common {
 
     public DiaDeviceType DiaDeviceType { get; set; } = DiaDeviceType.OA2000;//DIA計測装置 瞳孔径
 
+    public bool IsPtIdAdjustLength { get; set; } = false;//被検者IDの桁揃え有無
+    public int PtIdAdjustLength { get; set; } = -1;//被検者IDの桁揃え桁数
+
     //トレンドグラフ縦軸
     //縦軸範囲の固定・可変
     public VerticalAxisSetting VerticalAxisSetting { get; set; } = VerticalAxisSetting.Fixed;
@@ -111,8 +195,8 @@ namespace AxialManagerS_Converter.Common {
     public double VerticalAxisFixedLowerLimit { get; set; } = 20.0;//トレンドグラフ可変下限値
 
     public bool BarcodeSearchSetting { get; set; } = true;//バーコード検索設定有効
-    public string BarcodeIDStartIndex { get; set; } = "1";//バーコードのID読み込み開始位置
-    public string BarcodeIDStringNum { get; set; } = "64";//バーコード　ID文字数
+    public int BarcodeIDStartIndex { get; set; } = 1;//バーコードのID読み込み開始位置
+    public int BarcodeIDStringNum { get; set; } = 64;//バーコード　ID文字数
 
     public bool VerticalAxisPlotValue { get; set; } = true;//トレンドグラフプロット値表示
 
@@ -215,7 +299,7 @@ namespace AxialManagerS_Converter.Common {
   //治療介入アラート年代別閾値
   public class TreatmentAlertAgeThreshold {
     public int Age { get; set; }//年齢
-    public double StandardValue { get; set; }//基準値
+    //public double StandardValue { get; set; }//基準値
     public double ChangeAmount { get; set; }//変化量
     public double AbnormalIncrementAmount { get; set; }//注意変化量
   }
@@ -362,4 +446,5 @@ namespace AxialManagerS_Converter.Common {
     public int AgeLimitUpper { get; set; }//年齢制限上限
     public int AgeLimitLower { get; set; }//年齢制限下限
   }
+
 }
