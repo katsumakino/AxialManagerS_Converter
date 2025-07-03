@@ -6,15 +6,12 @@
 
     // Jsonファイル読込の場合、配列のデフォルト値は、上書きされずに残ってしまうため、ココで追加する
     public void SetDefaultArray() {
-      // パスワードを暗号化
-      var encryptPasword = CryptoHelper.Encrypt("admin");
-
       // ログインユーザ設定
       LoginSetting = [
         new LoginSetting() {
               IsAdmin = true,
               ID = "admin",
-              Password = encryptPasword
+              Password = "il8ORXBSLaPqcx2ROgN1Cg=="
             }
       ];
 
@@ -192,10 +189,10 @@
     //縦軸範囲の固定・可変
     public VerticalAxisSetting VerticalAxisSetting { get; set; } = VerticalAxisSetting.Fixed;
 
-    public double VerticalAxisVariableUpperLimit { get; set; } = 28.0;//トレンドグラフ縦軸固定上限値
-    public double VerticalAxisVariableLowerLimit { get; set; } = 20.0;//トレンドグラフ固定下限値
-    public double VerticalAxisFixedUpperLimit { get; set; } = 40.0;//トレンドグラフ縦軸可変上限値
-    public double VerticalAxisFixedLowerLimit { get; set; } = 20.0;//トレンドグラフ可変下限値
+    public double VerticalAxisVariableUpperLimit { get; set; } = 40.0;//トレンドグラフ縦軸可変上限値
+    public double VerticalAxisVariableLowerLimit { get; set; } = 20.0;//トレンドグラフ可変下限値
+    public double VerticalAxisFixedUpperLimit { get; set; } = 28.0;//トレンドグラフ縦軸固定上限値
+    public double VerticalAxisFixedLowerLimit { get; set; } = 20.0;//トレンドグラフ固定下限値
 
     public bool BarcodeSearchSetting { get; set; } = true;//バーコード検索設定有効
     public int BarcodeIDStartIndex { get; set; } = 1;//バーコードのID読み込み開始位置
@@ -216,6 +213,9 @@
 
     //伸長評価用年代別閾値
     public TreatmentAlertAgeThreshold[]? TreatmentAlertAgeThreshold { get; set; }
+
+    // 検索条件表示
+    public bool IsAgeCheck { get; set; } = true; // 年齢チェック
   }
 
   //眼軸長変換方式の選択　測定した値の内どれで表示を行うか
